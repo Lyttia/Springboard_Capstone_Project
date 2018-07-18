@@ -11,60 +11,70 @@ _I will be using an R interface to weather underground's API. In order to use th
 
 **0) Install & Load packages**
 
-`install.packages("tidyverse")`
-
-`library(tidyverse)`
-
-`install.packages("devtools")`
-
-`library(devtools)`
-
-`devtools::install_github("ALShum/rwunderground", force = TRUE)`
-
-`library(rwunderground)`
+```{r}
+#install.packages("tidyverse")
+library(tidyverse)
+#install.packages("devtools")
+library(devtools)
+#devtools::install_github("ALShum/rwunderground", force = TRUE)
+library(rwunderground)
+```
 
 **0a) Set Variables**
 
-`rwunderground::set_api_key("337b40a1234484ca")`
-
-`WUNDERGROUNDID = '337b40a1234484ca'`
+```{r}
+rwunderground::set_api_key("337b40a1234484ca")
+WUNDERGROUNDID = '337b40a1234484ca'
+```
 
 **1) Read and View original data (csv files)**
 
-`PropVars_original <- read_csv("RDC_InventoryCoreMetrics_Zip_Hist.csv")`
+```{r}
+PropVars_original <- read_csv("RDC_InventoryCoreMetrics_Zip_Hist.csv")
+View(PropVars_original)
 
-`View(PropVars_original)`
+Crime_df_original <- read_csv("Phoenix Crime Data 7.2.18.csv")
+View(Crime_df_original)
 
-`Crime_df_original <- read_csv("Phoenix Crime Data 7.2.18.csv")`
+Crime_df_refine <- separate(Crime_df_original, 2, c("Start Date", "Start Time"), sep = " ")
+Crime_df_refine <- separate(Crime_df_refine, 4, c("End Date", "End Time"), sep = " ")
 
-`View(Crime_df_original)`
-
-`Crime_df_refine <- separate(Crime_df_original, 2, c("Date Occurred On", "Time Occurred On"), sep = " ")`
-
-`Crime_df_refine <- separate(Crime_df_refine, 4, c("Date Occurred To", "Time Occurred To"), sep = " ")`
-
-`View(Crime_df_refine)`
-
-*Trying to make a vector/list of the UNIQUE values in the Crime ZIP column to use as set_location zipcode values. This needs to be edited to include only the unique values:*
-
-`ZIPCODE <- as.list(c(Crime_df_refine$ZIP))`
-
-`ZIPCODE`
+View(Crime_df_refine)
+```
 
 **1a) Call Wundergound API to create the PHX weather history df to be analyzed**
 
-`WVars_originalTEST <- history_range(sapply(ZIPCODE, set_location), date_start = "20151101", date_end = "20151102")` 
+```{r}
+ZIPCODE = (as.character(unique(Crime_df_refine$ZIP)))
 
-*NOTE: The above code throws an error message due to set_location being more than one value. The dates used above are TEST DATES to limit calls while experimenting.*
+location_zips = sapply(ZIPCODE, set_location)
 
-`View(WVars_originalTEST)`
+getdata <- function(location_zip,date_start = "20151101", date_end = "20151102")
+
+{ df  = history_range(location_zip,date_start,date_end)
+  return (df) }
+
+df_combined = do.call(rbind, lapply(location_zips, getdata))
+
+View(df_combined)
+```
+
+*NOTE: The dates used above are TEST DATES to limit calls while experimenting.*
 
 **1b) Clean Variables/Column Names/Observations** 
 
-`PropVars_refine <- PropVars_original[ which (PropVars_original$ZipName == "Phoenix, AZ" & PropVars_original$Month >= 2015-11-01), ]`
+```{r}
+PropVars_refine <- PropVars_original[ which (PropVars_original$ZipName == "Phoenix, AZ" & PropVars_original$Month >= 2015-11-01), ]
+```
 
 *NOTE: The above code does not successfully remove observations (PropVars_original$Month aka:dates) before 2015-11-01. Need to edit date format. Maybe convert column to different(unknown) date format before trying code above.* 
 
-`PropVars_refine <- PropVars_refine %>% select('ZipName', 'Month', 'ZipCode', 'Median Listing Price', 'Avg Listing Price', 'Total Listing Count')`
+```{r}
+PropVars_refine <- PropVars_refine %>% select('ZipName', 'Month', 'ZipCode', 'Median Listing Price', 'Avg Listing Price', 'Total Listing Count')
+```
 
-`View(PropVars_refine)`
+*Find the distribution of listing prices to determine whether to use median or mean in PropVars_refine df.* 
+
+```{r}
+View(PropVars_refine)
+```
