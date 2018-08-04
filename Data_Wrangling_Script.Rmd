@@ -7,7 +7,7 @@ output: html_document
 
 # Capstone Project Data Wrangling  
 
-_I will be using an R interface to weather underground's API. In order to use this library you must obtain an API key. Prior to ____, a free key was available. The free key limits requests to 10 per minute. If you are grabbing weather for a large date range using history_range then by default limit = 10 will limit the calls to a maximum of 10 per minute. This package has functions that follow the online api._
+_I will be using an R interface to weather underground's API. In order to use this library you must obtain an API key. A free key was available in the past. The free key limits requests to 10 per minute. If you are grabbing weather for a large date range using history_range then by default limit = 10 will limit the calls to a maximum of 10 per minute. This package has functions that follow the online api._
 
 **0) Install & Load packages**
 
