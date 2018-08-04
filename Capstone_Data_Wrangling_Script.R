@@ -9,8 +9,9 @@
 
 # 0-Install & Load packages=================================================
 
-install.packages("tidyverse")
+install.packages("tidyverse", dependencies = TRUE)
 install.packages("devtools")
+install.packages("stringi", dependencies = TRUE)
 library(tidyverse)
 library(devtools)
 devtools::install_github("ALShum/rwunderground", force = TRUE)
@@ -26,16 +27,14 @@ WUNDERGROUNDID = '337b40a1234484ca'
 # property data original csv is too large to upload to github. 
 # access the original csv file from [Realtor.com](https://www.realtor.com/research/data)
 
-propvals_original <- read_csv("RDC_InventoryCoreMetrics_Zip_Hist.csv")
-propvals <- tbl_df(propvals_original)
-propvals
-str(propvals)
-head(propvals)
-data.frame(head(propvals))
+property_original <- read_csv("RDC_InventoryCoreMetrics_Zip_Hist2.csv")
+property <- tbl_df(property_original)
+str(property)
+head(property)
+data.frame(head(property))
 
 crimes_original <- read_csv("Phoenix Crime Data 7.2.18.csv")
 crimes <- tbl_df(crimes_original)
-crimes
 str(crimes)
 head(crimes)
 data.frame(head(crimes))
@@ -50,30 +49,64 @@ getdata <- function(location_zip, date_start = "20151101",
                     return (df)
                     }
 weather_df_combined = do.call(rbind, lapply(location_zips, getdata))
-View(weather_df_combined)
 weather_df_combined <- tbl_df(weather_df_combined)
+View(weather_df_combined)
 
 # Why DOES this NOT WORK?: 
 # weatheroriginalTEST <- history_range(sapply(zip_code, set_location), 
-#                                     date_start = "20151101", 
-#                                     date_end = "20151102") TEST DATES
-# view(weatheroriginalTEST)
+                                     #date_start = "20151101", 
+                                     #date_end = "20151102") #TEST DATES
+# Error in is.url(url) : length(url) == 1 is not TRUE
 
 # 2-Clean Variables/Column Names/Observations================================
 
-propvals <- propvals[ which(propvals$ZipName == "Phoenix, AZ" & 
-                            propvals$Month >= "2015-10-01"), ]  
-propvals <- propvals %>% 
-  select('Month', 'ZipCode', 'Median Listing Price', 'Total Listing Count') 
+weather <- weather_df_combined %>%
+  select('date', 'temp', 'cond') %>%
+  separate("date", c("date", "time"), sep = " ") %>%
+  separate("date", c("year", "month", "day"), sep = "-") %>%
+  separate("time", c("hour"), sep = ":") %>% #discarded minutes for join
+  rownames_to_column("zipcode")
+# adding row names to use for join
+weather$zipcode <- substr(weather$zipcode, 1, 5)
+# substring row names to use for join
+View(weather)
 
-View(propvals)
+# some reason this didn't work below:
+# weather <- separate(weather, "zipcode", c("zipcode", "callcount"), sep = ".")
 
-# separate date and time in crimes df
-crimes <- separate(crimes, 2, c("start_date", "start_time"), sep = " ")
-crimes <- separate(crimes, 4, c("end_date", "end_time"), sep = " ")
+property <- property %>% 
+  filter(ZipName == "Phoenix, AZ" & Month >= "2015-10-01") %>%
+  select(Month, zipcode = ZipCode, median_value = "Median Listing Price", 
+         total_listed = "Total Listing Count") %>%
+  separate("Month", c("year", "month", "day"), sep = "-") %>% 
+  select(-"day")
+View(property)
+
+crimes <- crimes %>%
+  select(-"OCCURRED TO") %>% 
+  separate("OCCURRED ON", c("start_date", "start_time"), sep = "  ") %>%
+  separate("start_date", c("month", "day", "year"), sep = "/") %>%
+  separate("start_time", c("hour", "minute"), sep = ":") %>% 
+  rename(category = "UCR CRIME CATEGORY", block = "100 BLOCK ADDR", 
+         zipcode = "ZIP", premise = "PREMISE TYPE")
+crimes$zipcode <- as.character(crimes$zipcode)
+# change zipcode to chr string for join
 View(crimes)
 
+# 3- Join dataframes=======================================================
+
+crimes2 <- left_join(crimes, property)
+View(crimes2)
+# missing all property data from 6/2018 onward.
+# there is no way to know future property data for prediction model.
+
+crimes3 <- left_join(crimes2, weather)
+View(crimes3)
+# missing all weather data after 11/2/15 (These are test dates, to be
+# replaced with actual dates)
+# why are there missing values for weather if zipcodes were used fm crime df
+
+# Analysis Ideas:
+# crimes %>% group_by(zipcode) %>% summarise(count)
 # Next Steps:
-# Propvals df: Rename- month, year, zip_code, median_value, total_listing  
-# Crimes df: Remove- 100 Block Addr Crime, Separate- dates col to month, year, day
-# Possibly create dummy variables for premise type and crime type (ucr crime category)
+# Possibly create dummy variables for premise and category?
