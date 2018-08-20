@@ -102,11 +102,72 @@ View(crimes2)
 
 crimes3 <- left_join(crimes2, weather)
 View(crimes3)
+
+which(is.na(crimes3))
+sum(is.na(crimes3))
+colSums(is.na(crimes3))
+
+unique(crimes3$category)
+category <- crimes3$category
+
+# Create Dummy Variables
+
+vehicle_theft <- ifelse(category == "MOTOR VEHICLE THEFT", 1, 0) 
+rape <- ifelse(category == "RAPE", 1, 0)
+larceny_theft <- ifelse(category == "LARCENY-THEFT", 1, 0)
+drug_offense <- ifelse(category == "DRUG OFFENSE", 1, 0)
+burglary <- ifelse(category == "BURGLARY", 1, 0)
+aggravated_assault <- ifelse(category == "AGGRAVATED ASSAULT", 1, 0)
+homicide <- ifelse(category == "MURDER AND NON-NEGLIGENT MANSLAUGHTER", 1, 0)
+robbery <- ifelse(category == "ROBBERY", 1, 0)
+arson <- ifelse(category == "ARSON", 1, 0)
+
+premise <- crimes3$premise
+
+residential_count <- length(which(premise == "SINGLE FAMILY HOUSE")) 
+residential_count2 <- length(which(premise == "SINGLE FAMILY HOUSING")) 
+residential_count3 <- length(which(premise == "FENCED RESIDENTIAL YARD"))
+tot_res_count <- residential_count + residential_count2 + residential_count3 
+tot_res_count
+
+school_count <- length(which(premise == "SCHOOL/COLLEGE/CHILD CARE"))
+school_count2 <- length(which(premise == "CHILD CARE / DAY CARE"))
+school_count3 <- length(which(premise == "SCHOOL-COLLEGE/UNIVERSITY")) 
+school_count4 <- length(which(premise == "SCHOOL-ELEMENTARY/SECONDARY"))
+tot_school_count <- school_count + school_count2 + school_count3 + 
+  school_count4
+tot_school_count
+
+apartment_count <- length(which(premise == "APARTMENT"))
+apartment_count
+
+condotownhouse_count <- length(which(premise == "CONDO / TOWNHOUSE"))
+condotownhouse_count
+
+hotelmotel_count <- length(which(premise == "HOTEL / MOTEL"))
+hotelmotel_count
+
+#single_family_residence <- ifelse(premise == "SINGLE FAMILY HOUSE"|
+                               "SINGLE FAMILY HOUSING"|
+                               "FENCED RESIDENTIAL YARD", 1, 0) 
+
+#school <- ifelse(premise == "SCHOOL/COLLEGE/CHILD CARE"|
+                   "CHILD CARE / DAY CARE"| "SCHOOL-COLLEGE/UNIVERSITY"|
+                   "SCHOOL-ELEMENTARY/SECONDARY", 1, 0) 
+
+apartment <- ifelse(premise == "APARTMENT", 1, 0)
+
+condo_townhouse <- ifelse(premise == "CONDO / TOWNHOUSE", 1, 0)
+
+# crimes3 <- add_column(crimes3, )
+
+# crimes3 %>% group_by(zipcode) %>% summarise()
+
 # missing all weather data after 11/2/15 (These are test dates, to be
 # replaced with actual dates)
 # why are there missing values for weather if zipcodes were used fm crime df
 
 # Analysis Ideas:
-# crimes %>% group_by(zipcode) %>% summarise(count)
+# 
 # Next Steps:
-# Possibly create dummy variables for premise and category?
+# Create dummy variables for premise? (there are 95 unique values)
