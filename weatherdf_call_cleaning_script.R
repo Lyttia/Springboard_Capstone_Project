@@ -1,7 +1,6 @@
-#rwunderground Call 
+#Rwunderground Call/ Cleaning Script
 
-
-# I will be using an R interface to weather underground's API. 
+# I am using an R interface to weather underground's API. 
 # In order to use this library you must obtain an API key. In the past, 
 # a free key was available. The free key limits requests to 10 per minute. 
 # If you are grabbing weather for a large date range using history_range 
@@ -9,6 +8,11 @@
 # per minute. This package has functions that follow the online api.
 
 # 0-Install & Load packages=================================================
+install.packages("tidyverse", dependencies = TRUE)
+install.packages("devtools")
+install.packages("stringi", dependencies = TRUE)
+library(tidyverse)
+library(devtools)
 devtools::install_github("ALShum/rwunderground", force = TRUE, 
                          dependencies = TRUE)
 library(rwunderground)
@@ -116,5 +120,6 @@ weather <- weather_df_combined %>%
 # adding row names to use for join
 weather$zipcode <- substr(weather$zipcode, 1, 5)
 # substring row names to use for join
+
 View(weather)
 
