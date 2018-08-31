@@ -29,13 +29,17 @@ View(crimes)
 # fill na dates by order of date/time reported
 crimes1 <- crimes %>% fill(month, day, year, hour)
 View(crimes1)
+# to see crimes missing dates:
+crimes_missing_dates <- crimes %>% filter(is.na(month))
 
 # 3- Join dataframes=======================================================
 
 crimes2 <- left_join(crimes1, property1)
+#Joining, by = c("month", "year", "zipcode")
 View(crimes2)
 
 crimes3 <- left_join(crimes2, weather)
+#Joining, by = c("month", "day", "year", "hour", "zipcode")
 View(crimes3)
 
 # 4- Exploring Missing Data==================================================
