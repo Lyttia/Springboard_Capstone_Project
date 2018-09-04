@@ -49,6 +49,15 @@ barplot(months2017)
 barplot(months2016)
 barplot(months2017RC[order(months2017RC, decreasing = TRUE)])
 barplot(months2016RC[order(months2016RC, decreasing = TRUE)])
+
+# Tally by month the dplyr way
+group_by(crimes2017, monthRC) %>%
+    summarise(count = n()) %>%
+    arrange(desc(count))
+
+group_by(crimes2016, monthRC) %>%
+    summarise(count = n()) %>%
+    arrange(desc(count))
 ```
 
 2. Trends (high, low, increase, decrease, anomalies):
@@ -66,11 +75,28 @@ Crime count seems to be between 5,000-5,500 each month.
 # install.packages("ggplot2")
 library(ggplot2)
 ```
-Are any categories more prevelant at a certain time of the month?
+
 ```{r}
-ggplot(crimes4, aes(x = month, y= day, color = category)) +
-  geom_jitter(alpha = 1)
+my_theme <- theme_bw() +
+    theme(panel.border = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(size = 0.5),
+          axis.title = element_text(colour = "grey40"),
+          plot.title = element_text(vjust = 2.0))
+
+ggplot(data = crimes2017, aes(x = monthRC)) + 
+    my_theme +
+    geom_bar(stat = "count", fill = "lightblue", width = 0.75) +
+    ggtitle("Total Crimes by Month in 2017") +
+    xlab(NULL) +
+    ylab("Total Crime Count")
+
+ggsave("total_crimes_by_month")
 ```
+
+Are any categories more prevelant at a certain time of the month?
 
 Does overall crime count increase or decrease as property values increase?
 Property values need to be binned. 
