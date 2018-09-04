@@ -93,7 +93,7 @@ ggplot(data = crimes2017, aes(x = monthRC)) +
     xlab(NULL) +
     ylab("Total Crime Count")
 
-ggsave("total_crimes_by_month")
+ggsave("total_crimes_by_month2017.png")
 ```
 
 Are any categories more prevelant at a certain time of the month?
