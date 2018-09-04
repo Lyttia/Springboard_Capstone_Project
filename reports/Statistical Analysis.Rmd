@@ -24,7 +24,8 @@ Total number of each category of crime.
 crime_count_by_category <- crimes4 %>% count(category)
 crime_count_by_category
 categories <- table(crimes4$category)
-barplot(categories[order(categories, decreasing = TRUE)])
+ordered_categories <- categories[order(categories, decreasing = TRUE)]
+barplot(ordered_categories)
 ```
 
 Total number of each category of crime in zip code with highest crime count. 
@@ -112,15 +113,37 @@ barplot(zipcodes[order(crimes4$median_value, decreasing = TRUE)])
 ```
 
 Scatterplots:
-x=
+
 ```{r}
 
 ```
 
 5. Can you make a time-series plot?
-x= date, y= crime count
-```{r}
 
+```{r}
+# Subset the data for the less frequent categories
+sub <- levels(ordered_categories)[1:4] # Create a subseting object
+temp <- filter(crimes4, category %in% sub) # Subset using dplyr
+
+# Make plot
+ggplot(temp, aes(x = monthRC, color = category, group = category)) +
+    my_theme +
+    geom_line(stat = "bin", size = 1) +
+    ggtitle("Crimes by Month - Less Frequent Categories") +
+    xlab(NULL) +
+    ylab("Crime Count")
+
+# Do another subset for the more frequent categories
+sub <- levels(ordered_categories)[5:7]
+temp <- filter(crimes4, category %in% sub)
+
+# Make second plot
+ggplot(temp, aes(x = monthRC, color = category, group = category)) + 
+    my_theme +
+    geom_line(stat = "bin", size = 1) +
+    ggtitle("Crime by Month - More Frequent Categories") +
+    xlab(NULL) +
+    ylab("Crime Count")
 ```
 
 6.Having made these plots, what are some insights you get from them? Do you see any correlations? Is there a hypothesis you would like to investigate further? What other questions do they lead you to ask?
