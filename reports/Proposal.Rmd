@@ -1,0 +1,45 @@
+---
+title: "Springboard Capstone Project Proposal"
+author: "Lyttia Cancinos-McManus"
+date: "June 29, 2018"
+output: html_document
+---
+
+# Predicting crime in Phoenix, AZ 
+
+_This project aims to help make the city of Phoenix a safer place to ["live, work, and play"](https://www.phoenix.gov/)._ 
+
+### Main Questions:
+1. Where, when, and what type of crime will occur next? 
+2. How many and which officers should be stationed in a certain area? 
+
+### The Client:
+* The Phoenix Police Department will be able to use a predictive crime “hotspot map” that shows where and which types of crimes are most likely to occur in each location and determine how many officers are needed to respond or patrol the area. 
+* This would allow officers to allocate a limited number of resources where they are needed the most. 
+* Other clients may be home buyers, community developers, or city planners who want to decide whether to purchase a house or plan land for development. 
+
+### The Data:
+* Crime Data will come from the City of Phoenix Open Data website found here: [Phoenix Crime Data](https://phoenixopendata.com/dataset/crime-data/resource/0ce3411a-2fc6-4302-a33f-167f68608a20?view_id=644b88ef-16b3-497d-9413-2ba3eedfd3c1). It comes in the form of a “csv file which is updated daily by 11am and includes incidents from November 1st, 2015 forward through 7 days prior to today's posting date. Homicides, rapes, robberies, aggravated assaults, burglaries, thefts, motor vehicle thefts, arsons, and drug offenses are included (based on the primary offense listed for each incident.”
+    + At this time (7/2/2018 8:00pm), the original dataset includes 169,818 observations of 7 variables. The file will be updated to include new crimes on a daily basis.
+    + _Variables include the Crime incident number, earliest and latest date and time of occurrence of crime, Uniform Crime Reporting crime type, hundred block address, zip code, type of location/premise._ 
+* Weather data will come from the Rwundergound package in R. Documentation can be found here: [Weather Data](https://github.com/ALShum/rwunderground). I will use the R interface to "call" a custom tbl_df with date, temperature, dew point, humidity, wind speed, gust and direction, visibility, pressure,
+wind chill, heat index, precipitation, condition, fog, rain, snow, hail, thunder, and tornado conditions from 11-1-2015 to 6-30-2018.
+    + An API key is needed to call data. 
+    + The original dataset includes ____ observations of 18 variables. 
+    + _Variables include the date, temperature, dew point, humidity, wind speed, gust and direction, visibility, pressure, wind chill, heat index, precipitation, condition, fog, rain, snow, hail, thunder, and tornado conditions._ 
+* Median list price by zip code (as a measure of prosperity) will come from residential listings database found here: [Realtor.com](https://www.realtor.com/research/data). The data is “based on the most comprehensive and accurate database of MLS-listed for-sale homes in the industry”.
+    + The original dataset includes 1,094,091 observations of 34 variables (will only be using data from Phoenix zip codes- 2,993 entries before filtered by date). 
+    + _The data includes variables such as: median list price, average list price, luxury list price, median days on market, average days on market, total active listings, new listings, price increases, and price reductions by zip code from 5-1-12 to 5-1-2018. Many of these variables will be removed for my analysis._  
+
+### Approach:
+1. Clean crime, weather, and property value datasets to include only the intended variables from Phoenix zip codes occuring through the years 2015-2018. 
+2. Join dataframes by zip code and date.
+3. Look for crime patterns by type, day, time, zip code, housing value, avg. daily temp./weather conditions, etc. (creating new categories to combine smaller categories if needed) using Time Series Analysis.
+4. Using Nov. 2015-17 data, build algorithm/model to predict crimes for Jan.- June 2018. (training set)
+5. Compare what we find in 2018 to test reliability of algorithm. (test set)
+6. Predict crimes for next six months of 2018 (July-Dec). 
+
+### Deliverables:
+* R Code that wrangles and analyzes the data.  
+* A report on the problem, process, and findings.  
+* A slide deck to present to the client. 
