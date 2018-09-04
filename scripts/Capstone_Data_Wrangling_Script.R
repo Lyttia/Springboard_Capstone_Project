@@ -37,6 +37,7 @@ crimes1$monthRC <- factor(x = crimes1$month,
                                   "Jul" ,"Aug" ,"Sep" , "Oct", "Nov", "Dec"),
                        ordered = T)
 View(crimes1)
+
 # 3- Join dataframes=======================================================
 
 crimes2 <- left_join(crimes1, property1)
@@ -47,49 +48,12 @@ crimes3 <- left_join(crimes2, weather)
 #Joining, by = c("month", "day", "year", "hour", "zipcode")
 View(crimes3)
 
-# 4- Exploring Missing Data=================================================
-# I might be missing property values for reasons other than missing zipcodes in property data
-# Zipcode may be present, but can't match by month&year(date)
-
-nopropval <- crimes3 %>% filter(is.na(median_value))
-
-View(nopropval)
-nopropval
-
-replace_zipcodes <- nopropval %>% filter(!is.na(month)) %>% distinct(zipcode)
-
-replace_zipcodes
-
-# 6 zipcodes missing, includes NA
-
-fill_dates <- nopropval %>% filter(is.na(month))
-
-View(fill_dates)# filled dates, now = 0
-
-missingzipcount <- nopropval %>% filter(!is.na(month)) %>% count(zipcode)
-
-View(missingzipcount)
-
-#missing 85034 downtown zipcode with 3,511 crimes
-
-contained_zipcodes <- crimes3 %>% filter(!is.na(median_value)) %>% 
-  distinct(zipcode) #96 zipcodes
-
-all_zipcodes <- crimes3 %>% distinct(zipcode) #102 zipcodes
-
-# data without na zipcodes
-crimes4 <- crimes3 %>% filter(!is.na(zipcode))
-
-
-
-# data with missing zipcodes, exclude this data fm analysis, use crimes4
-crimes5 <- crimes3 %>% filter(is.na(zipcode))
-
-View(crimes5)
-
 # 5- Create Dummy Variables================================================
-unique(crimes4$category)
-category <- crimes4$category
+unique(crimes3$category)
+category <- crimes3$category
+
+category <- factor(category)
+category <- reorder(category, X = category, FUN = length)
 
 vehicle_theft <- ifelse(category == "MOTOR VEHICLE THEFT", 1, 0) 
 rape <- ifelse(category == "RAPE", 1, 0)
@@ -101,16 +65,23 @@ homicide <- ifelse(category == "MURDER AND NON-NEGLIGENT MANSLAUGHTER", 1, 0)
 robbery <- ifelse(category == "ROBBERY", 1, 0)
 arson <- ifelse(category == "ARSON", 1, 0)
 
-crimes4 <- add_column(crimes4, vehicle_theft, rape, larceny_theft, 
+crimes3 <- add_column(crimes3, vehicle_theft, rape, larceny_theft, 
                       drug_offense, burglary, aggravated_assault, homicide, 
                       robbery, arson)
-View(crimes4)
-write_csv(crimes4, "crimes4.csv")
 
-violent <- if
-non-violent
+violent_crimes <- ifelse(rape == 1| robbery == 1| homicide == 1|
+                           aggravated_assault == 1| arson == 1, 1, 0)
 
-premise <- crimes4$premise
+nonviolent_crimes <- ifelse(vehicle_theft == 1| larceny_theft == 1| 
+                              drug_offense == 1| burglary == 1, 1, 0)
+
+crimes3 <- add_column(crimes3, violent_crimes, nonviolent_crimes)
+
+View(crimes3)
+
+###UNDER CONSTRUCTION###
+
+premise <- crimes3$premise
 unique(premise) %>% length()
 length(unique(premise))
 unique_premise <- unique(premise)
@@ -163,7 +134,7 @@ premise_categories <- sapply(premise, combine_premise)
 
 # Add premise_categories column to df
 
-crimes4 <- add_column(crimes4, premise_categories)  
+crimes3 <- add_column(crimes3, premise_categories)  
 
 # Create premise_categories dummy variables 
 
@@ -178,5 +149,46 @@ condo_townhouse <- ifelse(premise_categories == "CONDO / TOWNHOUSE", 1, 0)
 
 # Add premise_categories dummy variables to df
 
-crimes4 <- add_column(crimes4, single_family_residence, schools_childcare, 
+crimes3 <- add_column(crimes3, single_family_residence, schools_childcare, 
                       apartment, condo_townhouse,... )  
+
+###END CONSTRUCTION###
+
+# 4- Exploring Missing Data=================================================
+# I might be missing property values for reasons other than missing zipcodes in property data
+# Zipcode may be present, but can't match by month&year(date)
+
+nopropval <- crimes3 %>% filter(is.na(median_value))
+
+View(nopropval)
+
+replace_zipcodes <- nopropval %>% filter(!is.na(month)) %>% distinct(zipcode)
+
+replace_zipcodes # 6 zipcodes missing, includes NA
+
+fill_dates <- nopropval %>% filter(is.na(month))
+
+View(fill_dates) # filled dates, now = 0
+
+missingzipcount <- nopropval %>% filter(!is.na(month)) %>% count(zipcode)
+
+View(missingzipcount) #missing 85034 downtown zipcode with 3,511 crimes
+
+contained_zipcodes <- crimes3 %>% filter(!is.na(median_value)) %>% 
+  distinct(zipcode) 
+View(contained_zipcodes) #96 zipcodes
+
+all_zipcodes <- crimes3 %>% distinct(zipcode) 
+all_zipcodes #102 zipcodes
+
+# data without na zipcodes
+crimes4 <- crimes3 %>% filter(!is.na(zipcode))
+
+# data with missing zipcodes, exclude this data fm analysis, use crimes4
+crimes5 <- crimes3 %>% filter(is.na(zipcode))
+
+View(crimes5)
+
+write_csv(crimes4, "crimes4.csv")
+View(crimes4)
+
