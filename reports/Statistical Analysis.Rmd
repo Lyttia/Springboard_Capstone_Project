@@ -5,6 +5,8 @@ date: "September 2, 2018"
 output: html_document
 ---
 ```{r}
+install.packages("ggplot2")
+library(ggplot2)
 library(tidyverse)
 crimes4 <- read.csv("crimes4.csv")
 ```
@@ -17,6 +19,7 @@ crime_count_by_zip
 zipcodes <- table(crimes4$zipcode)
 zipcodes
 barplot(zipcodes[order(zipcodes, decreasing = TRUE)])
+
 ```
 
 Total number of each category of crime. 
@@ -75,9 +78,7 @@ Crime count seems to be between 5,000-5,500 each month.
 ```{r}
 # install.packages("ggplot2")
 library(ggplot2)
-```
-
-```{r}
+#-----------------Setup Theme--------------------------------------------------
 my_theme <- theme_bw() +
     theme(panel.border = element_blank(),
           axis.ticks = element_blank(),
@@ -87,20 +88,66 @@ my_theme <- theme_bw() +
           axis.title = element_text(colour = "grey40"),
           plot.title = element_text(vjust = 2.0))
 
+#-----------------Total Crimes by Month 2017 (order alpha)---------------------
 ggplot(data = crimes2017, aes(x = monthRC)) + 
     my_theme +
     geom_bar(stat = "count", fill = "lightblue", width = 0.75) +
-    ggtitle("Total Crimes by Month in 2017") +
-    xlab(NULL) +
-    ylab("Total Crime Count")
+    ggtitle("Crimes reported to Phoenix PD each Month in 2017") +
+    xlab("Month (alpha order)") +
+    ylab("Crime Count")
 
-ggsave("total_crimes_by_month2017.png")
+#----------------Total Crimes by Month 2017 (order decr)-----------------------
+dplyr::count(crimes2017, monthRC) %>% 
+  arrange(-n) %>% 
+  mutate(monthRC = factor(monthRC, monthRC)) %>% 
+  ggplot(aes(x = monthRC, y = n)) + 
+  geom_bar(stat = "identity", fill = "lightblue", width = 0.75) + 
+  my_theme +
+  ggtitle("Crimes reported to Phoenix PD each Month in 2017") +
+  xlab("Month (ordered by crime count)") +
+  ylab("Crime Count")
+
+ggsave("crime_count_by_month2017.png")
 ```
 
-Are any categories more prevelant at a certain time of the month?
+Are any categories more prevelant at a certain time?
+
+```{r}
+crimes2017$category <- factor(x = crimes2017$category)
+crimes2017$category <- reorder(x = crimes2017$category, X = crimes2017$category, FUN = length)
+
+# Tally by type
+table(crimes2017$category)[order(table(crimes2017$category), decreasing = T)] # Order decreasing
+
+# Subset the data for the less frequent categories
+sub <- levels(crimes2017$category)[1:4] # Create a subsetting object
+temp <- filter(crimes2017, sub %in% category) # Subset using dplyr
+View(temp)
+
+# Make plot
+ggplot(data = temp, aes(x = monthRC, color = category, group = category)) +
+    my_theme +
+    geom_line(stat = "bin", size = 1) +
+    ggtitle("Crimes by Month - Less Frequent Categories") +
+    xlab(NULL) +
+    ylab("Crime Count")
+
+# Do another subset for the more frequent categories
+sub <- levels()[5:7]
+temp <- filter(crimes2017, category %in% sub)
+
+# Make second plot
+ggplot(data = temp, aes(x = monthRC, color = category, group = category)) + 
+    my_theme +
+    geom_line(stat = "bin", size = 1) +
+    ggtitle("Crimes by Month - More Frequent Categories") +
+    xlab(NULL) +
+    ylab("Crime Count")
+```
 
 Does overall crime count increase or decrease as property values increase?
 Property values need to be binned. 
+
 ```{r}
 
 ```
@@ -110,6 +157,7 @@ Compare the amounts of crimes in each zip code ordered by property value.
 
 ```{r}
 barplot(zipcodes[order(crimes4$median_value, decreasing = TRUE)])
+
 ```
 
 Scatterplots:
@@ -121,6 +169,35 @@ Scatterplots:
 5. Can you make a time-series plot?
 
 ```{r}
+install.packages("plotly")
+library(plyr)
+library(dplyr)
+library(plotly)
+
+crimes2016_2017 <- filter(crimes4, year %in% c("2016","2017"))
+View(crimes2016_2017)
+
+total_crime_2years <-
+  crimes2016_2017 %>% 
+  mutate(year = as.integer(as.character(year))) %>%
+  group_by(crime.type, year) %>% 
+  dplyr::summarize(reported_incidents = n())
+
+trend_plot <- 
+  ggplot(data = total_crime_2years,
+       aes(x = year, y = reported_incidents, fill = crime.type)) +
+  geom_area() +
+  ggtitle("Violent vs. Non-Violent Crimes in 2016-2017") +
+  scale_y_continuous(name = "Reported Incidents", labels = scales::comma) +
+  my_theme
+
+ggplotly(trend_plot)
+
+```
+
+
+```{r} 
+# NOT WORKING
 # Subset the data for the less frequent categories
 sub <- levels(ordered_categories)[1:4] # Create a subseting object
 temp <- filter(crimes4, category %in% sub) # Subset using dplyr
@@ -149,5 +226,5 @@ ggplot(temp, aes(x = monthRC, color = category, group = category)) +
 6.Having made these plots, what are some insights you get from them? Do you see any correlations? Is there a hypothesis you would like to investigate further? What other questions do they lead you to ask?
 
 Limitations: 
-Accounts only for crimes reported to Phoenix PD. There may be many other crimes reported to surrounding cities PDs. Would my model be more accurate if I only included zip codes located in Phoenix boundaries?
+Accounts only for crimes reported to Phoenix PD. There may be many other crimes reported to surrounding PDs. Would my model be more accurate if I only included zip codes located within Phoenix boundaries?
 
