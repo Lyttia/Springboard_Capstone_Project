@@ -77,7 +77,11 @@ nonviolent_crimes <- ifelse(vehicle_theft == 1| larceny_theft == 1|
 
 crimes3 <- add_column(crimes3, violent_crimes, nonviolent_crimes)
 
+crime.type <- ifelse(violent_crimes == 1, "violent", "nonviolent")
+
+crimes3 <- add_column(crimes3, crime.type)
 View(crimes3)
+
 
 ###UNDER CONSTRUCTION###
 
