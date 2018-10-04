@@ -2,11 +2,11 @@
 title: "Rwunderground Call/ Cleaning Script"
 output: html_notebook
 ---
-#Rwunderground Call/ Cleaning Script
+# Rwunderground Call/ Cleaning Script
 
 *I am using an R interface to weather underground's API. In order to use this library you must obtain an API key. In the past, a free key was available. The free key limits requests to 10 per minute. If you are grabbing weather for a large date range using history_range then by default limit = 10 will limit the calls to a maximum of 10 per minute. This package has functions that follow the online api.*
 
-**0-Install & Load packages=================================================**
+**0- Install & Load packages**
 
 ```{r}
 #install.packages("tidyverse", dependencies = TRUE)
@@ -21,7 +21,7 @@ rwunderground::set_api_key("337b40a1234484ca")
 WUNDERGROUNDID = '337b40a1234484ca'
 ```
 
-# Create function to Call rwundergound API Package and produce PHX weather history df
+**Create function to Call rwundergound API Package and produce PHX weather history df**
 
 ```{r}
 now <- Sys.time()
@@ -275,14 +275,14 @@ weather_df_combined19 <- tbl_df(weather_df_combined19)
 
 ```
 
-# Join Weather dataframes
+**Join Weather dataframes**
 
 ```{r}
 weather_dfs_combined <- join(...)
 View(weather_dfs_combined)
 ```
 
-# 2-Clean Variables/Column Names/Observations===============================
+**2- Clean Variables/Column Names/Observations**
 
 ```{r}
 weather <- weather_df_combined %>%
