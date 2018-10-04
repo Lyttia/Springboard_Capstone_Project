@@ -21,7 +21,7 @@ rwunderground::set_api_key("337b40a1234484ca")
 WUNDERGROUNDID = '337b40a1234484ca'
 ```
 
-**Create function to Call rwundergound API Package and produce PHX weather history df**
+**1a- Create function to Call rwundergound API Package and produce PHX weather history df**
 
 ```{r}
 now <- Sys.time()
@@ -275,7 +275,7 @@ weather_df_combined19 <- tbl_df(weather_df_combined19)
 
 ```
 
-**Join Weather dataframes**
+**1b- Join Weather dataframes**
 
 ```{r}
 weather_dfs_combined <- join(...)
