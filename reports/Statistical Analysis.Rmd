@@ -149,6 +149,16 @@ Does overall crime count increase or decrease as property values increase?
 Property values need to be binned. 
 
 ```{r}
+lowermiddlehousing = subset(crimes4, median_value < 500000)
+middlehousing = subset(lowermiddlehousing, median_value >= 250000)
+lowincomehousing = subset(crimes4, median_value < 250000)
+upperhousing = subset(crimes4, median_value >= 500000)
+
+plot(count(lowincomehousing, median_value), lowincomehousing$median_value)
+plot(count(middlehousing, median_value), middlehousing$median_value)
+plot(count(upperhousing, median_value), upperhousing$median_value)
+
+reg()
 
 ```
 
