@@ -135,12 +135,14 @@ getdata11.5 <- function(location_zip, date_start = "20160416",
                       limit = 5)
   return (df)
 }
+
 getdata12 <- function(location_zip, date_start = "20160501", 
                       date_end = "20160515"){
   df  = history_range(location_zip, date_start, date_end, 
                       limit = 5)
   return (df)
 }
+#---------------------->>>>>>>>>> START HERE <<<<<<<<<<----------------------------
 getdata12.5 <- function(location_zip, date_start = "20160516", 
                       date_end = "20160530"){
   df  = history_range(location_zip, date_start, date_end, 
@@ -218,7 +220,7 @@ weather_df_combined7.5 = do.call(rbind, lapply(location_zips, getdata7.5))
 #getdata7.5 stopped at index 38 (85021.121) on 12/20
 weather_df_combined7.75 = do.call(rbind, lapply(location_zips[39:102], getdata7.5))
 weather_df_combined8 = do.call(rbind, lapply(location_zips, getdata8))
-#---------------------->>>>>>>>>> START HERE <<<<<<<<<<----------------------------
+#----------------->>>>>>>>>> Check for missing values <<<<<<<<<<-----------------------
 weather_df_combined8.5 = do.call(rbind, lapply(location_zips, getdata8.5))
 # stopped at index (85250)
 weather_df_combined9 = do.call(rbind, lapply(location_zips, getdata9))
@@ -229,6 +231,7 @@ weather_df_combined10 = do.call(rbind, lapply(location_zips, getdata10))
 weather_df_combined10.5 = do.call(rbind, lapply(location_zips, getdata10.5))
 weather_df_combined11 = do.call(rbind, lapply(location_zips, getdata11))
 weather_df_combined11.5 = do.call(rbind, lapply(location_zips, getdata11.5))
+#---------------------->>>>>>>>>> START HERE <<<<<<<<<<----------------------------
 weather_df_combined12 = do.call(rbind, lapply(location_zips, getdata12))
 weather_df_combined12.5 = do.call(rbind, lapply(location_zips, getdata12.5))
 weather_df_combined13 = do.call(rbind, lapply(location_zips, getdata13))
