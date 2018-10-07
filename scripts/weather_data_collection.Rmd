@@ -222,17 +222,18 @@ weather_df_combined7.75 = do.call(rbind, lapply(location_zips[39:102], getdata7.
 weather_df_combined8 = do.call(rbind, lapply(location_zips, getdata8))
 #----------------->>>>>>>>>> Check for missing values <<<<<<<<<<-----------------------
 weather_df_combined8.5 = do.call(rbind, lapply(location_zips, getdata8.5))
-# stopped at index (85250)
+# stopped at (85250)
 weather_df_combined9 = do.call(rbind, lapply(location_zips, getdata9))
-#stopped at index ?
+#stopped at 
 weather_df_combined9.5 = do.call(rbind, lapply(location_zips, getdata9.5))
-#stopped at index (85250)
+#stopped at (85250)
 weather_df_combined10 = do.call(rbind, lapply(location_zips, getdata10))
 weather_df_combined10.5 = do.call(rbind, lapply(location_zips, getdata10.5))
 weather_df_combined11 = do.call(rbind, lapply(location_zips, getdata11))
 weather_df_combined11.5 = do.call(rbind, lapply(location_zips, getdata11.5))
-#---------------------->>>>>>>>>> START HERE <<<<<<<<<<----------------------------
 weather_df_combined12 = do.call(rbind, lapply(location_zips, getdata12))
+# stopped at: 20160504/q/85305
+#---------------------->>>>>>>>>> START HERE <<<<<<<<<<----------------------------
 weather_df_combined12.5 = do.call(rbind, lapply(location_zips, getdata12.5))
 weather_df_combined13 = do.call(rbind, lapply(location_zips, getdata13))
 weather_df_combined13.5 = do.call(rbind, lapply(location_zips, getdata13.5))
