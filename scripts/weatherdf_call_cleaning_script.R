@@ -11,10 +11,10 @@
 install.packages("tidyverse", dependencies = TRUE)
 install.packages("devtools")
 install.packages("stringi", dependencies = TRUE)
-library(tidyverse)
-library(devtools)
 devtools::install_github("ALShum/rwunderground", force = TRUE, 
                          dependencies = TRUE)
+library(tidyverse)
+library(devtools)
 library(rwunderground)
 
 # Set API key
@@ -132,8 +132,6 @@ weather_df_combined7.75 = do.call(rbind, lapply(location_zips[39:102], getdata7.
 weather_df_combined7.75 <- tbl_df(weather_df_combined7.75)
 View(weather_df_combined7.75)
 
-#---------------------->>>>>>>>>> START HERE <<<<<<<<<<--------------------------------
-
 getdata8 <- function(location_zip, date_start = "20160101", 
                        date_end = "20160115"){
   df  = history_range(location_zip, date_start, date_end, 
@@ -151,8 +149,11 @@ getdata8.5 <- function(location_zip, date_start = "20160116",
                       limit = 5)
   return (df)
 }
+#---------------------->>>>>>>>>> START HERE <<<<<<<<<<--------------------------------
 
 weather_df_combined8.5 = do.call(rbind, lapply(location_zips, getdata8.5))
+# stopped at index (85250)
+
 weather_df_combined8.5 <- tbl_df(weather_df_combined8.5)
 View(weather_df_combined8.5)
 
@@ -164,7 +165,9 @@ getdata9 <- function(location_zip, date_start = "20160201",
 }
 
 weather_df_combined9 = do.call(rbind, lapply(location_zips, getdata9))
-weather_df_combined9 <- tbl_df(weather_df_combined8)
+weather_df_combined9 <- tbl_df(weather_df_combined9)
+#stopped at index
+
 View(weather_df_combined9)
 
 getdata9.5 <- function(location_zip, date_start = "20160216", 
@@ -175,6 +178,7 @@ getdata9.5 <- function(location_zip, date_start = "20160216",
 }
 
 weather_df_combined9.5 = do.call(rbind, lapply(location_zips, getdata9.5))
+#stopped at index (85250) 
 weather_df_combined9.5 <- tbl_df(weather_df_combined9.5)
 View(weather_df_combined9.5)
 

@@ -21,7 +21,7 @@ crimes <- crimes %>%
   separate("start_date", c("month", "day", "year"), sep = "/") %>%
   separate("start_time", c("hour", "minute"), sep = ":") %>% 
   rename(category = "UCR CRIME CATEGORY", block = "100 BLOCK ADDR", 
-         zipcode = "ZIP", premise = "PREMISE TYPE")
+         zipcode = "ZIP", premise = "PREMISE TYPE") 
 crimes$zipcode <- as.character(crimes$zipcode)
 # change zipcode to chr string for join
 View(crimes)
@@ -37,6 +37,15 @@ crimes1$monthRC <- factor(x = crimes1$month,
                                   "Jul" ,"Aug" ,"Sep" , "Oct", "Nov", "Dec"),
                        ordered = T)
 View(crimes1)
+crimes1.5 <- crimes1 %>% filter(zipcode == c(85003, 85004, 85006, 85007, 85008, 85009, 
+                                               85012, 85013, 85014, 85015, 85016, 85017, 
+                                               85018, 85019, 85020, 85021, 85022, 85023, 
+                                               85024, 85026, 85027, 85028, 85029, 85031, 
+                                               85032, 85033, 85034, 85035, 85037, 85039, 
+                                               85040, 85041, 85042, 85043, 85044, 85045, 
+                                               85048, 85050, 85051, 85053, 85054, 85065, 
+                                               85073, 85083, 85085, 85086, 85087))
+
 
 # 3- Join dataframes=======================================================
 
@@ -82,6 +91,12 @@ crime.type <- ifelse(violent_crimes == 1, "violent", "nonviolent")
 crimes3 <- add_column(crimes3, crime.type)
 View(crimes3)
 
+phoenix_zips <- col(as.character(c(85003, 85004, 85006, 85007, 85008, 85009, 85012, 85013, 
+                  85014, 85015, 85016, 85017, 85018, 85019, 85020, 85021, 
+                  85022, 85023, 85024, 85026, 85027, 85028, 85029, 85031, 
+                  85032, 85033, 85034, 85035, 85037, 85039, 85040, 85041, 
+                  85042, 85043, 85044, 85045, 85048, 85050, 85051, 85053, 
+                  85054, 85065, 85073, 85083, 85085, 85086, 85087)))
 
 ###UNDER CONSTRUCTION###
 
@@ -186,7 +201,7 @@ all_zipcodes <- crimes3 %>% distinct(zipcode)
 all_zipcodes #102 zipcodes
 
 # data without na zipcodes
-crimes4 <- crimes3 %>% filter(!is.na(zipcode))
+crimes4 <- crimes3 %>% select("zipcode" == phoenix_zips) %>% filter(!is.na(zipcode))
 
 # data with missing zipcodes, exclude this data fm analysis, use crimes4
 crimes5 <- crimes3 %>% filter(is.na(zipcode))
