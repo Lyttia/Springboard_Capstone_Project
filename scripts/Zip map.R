@@ -31,3 +31,38 @@ PHX_zipmp <- ggmap(mapImage) +
 
 PHX_zipmp
 
+zipcoord <- read_csv(file.choose())
+
+zipcoord1 <- zipcoord %>% 
+  select(Zipcode, City, State, Lat, Long) %>% 
+  rename(zipcode = Zipcode)
+
+zipcoord1
+
+crimes4coord <- left_join(crimes4, zipcoord1) %>% 
+  select(-zipname)
+
+View(crimes4coord)
+
+#not helpful: all of the points in one zipcode were assigned to the same coordinate
+ggmap(mapImage, extent='device', legend="topleft") +
+  geom_point(aes(x= Long, y= Lat, colour=category), data=crimes4coord) +  
+  ggtitle('Crime in Phoenix')
+
+# broken apart by crime category
+ggmap(mapImage, extent='device') +
+  geom_point(aes(x= Long, y= Lat, colour= category), data=crimes4coord) +
+  scale_colour_discrete(guide='none') +
+  facet_wrap(~ category) +
+  ggtitle('Crime in Phoenix')
+
+# More helpful map as I can see the density of crime in each zipcode
+contours <- stat_density2d(
+  aes(x = Long, y = Lat, fill = ..level.., alpha=..level..),
+  size = 0.1, data = crimes4coord, n=200,
+  geom = "polygon")
+
+ggmap(mapImage, extent='device', legend="topleft") + contours +
+  scale_alpha_continuous(range=c(0.25,0.4), guide='none') +
+  scale_fill_gradient('Violent\nCrime\nDensity')+
+  ggtitle('Crime in Phoenix')
