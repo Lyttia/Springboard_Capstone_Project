@@ -1,0 +1,21 @@
+---
+title: "Sources"
+author: "Lyttia Cancinos-McManus"
+date: "October 19, 2018"
+output: html_document
+---
+Crime Data:
+[City of Phoenix Open Data](https://phoenixopendata.com/dataset/crime-data/resource/0ce3411a-2fc6-4302-a33f-167f68608a20?view_id=644b88ef-16b3-497d-9413-2ba3eedfd3c1)
+
+Zip code lat/lon coordinates:
+[Free Zip Code Database](http://federalgovernmentzipcodes.us/)
+  
+Property Data:
+[Realtor.com](https://www.realtor.com/research/data)
+
+Phoenix Area Base Map:
+[Google Maps Static API](https://developers.google.com/maps/documentation/maps-static/intro)
+
+Weather Data (weather conditions):
+[rwunderground API Rpackage](https://github.com/ALShum/rwunderground)
+
