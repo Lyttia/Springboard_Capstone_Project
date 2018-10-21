@@ -7,6 +7,7 @@ install.packages("devtools")
 install.packages("stringi", dependencies = TRUE)
 library(tidyverse)
 library(devtools)
+library(stringi)
 
 # 1-Read and view original data============================================= 
 
@@ -22,21 +23,29 @@ crimes <- crimes %>%
   separate("start_time", c("hour", "minute"), sep = ":") %>% 
   rename(category = "UCR CRIME CATEGORY", block = "100 BLOCK ADDR", 
          zipcode = "ZIP", premise = "PREMISE TYPE") 
-crimes$zipcode <- as.character(crimes$zipcode)
+
 # change zipcode to chr string for join
+crimes$zipcode <- as.character(crimes$zipcode)
+
+# check data
 View(crimes)
 
 # fill na dates by order of date/time reported
 crimes1 <- crimes %>% fill(month, day, year, hour)
 View(crimes1)
+
 # to see crimes missing dates:
 crimes_missing_dates <- crimes %>% filter(is.na(month))
 
+# add recoded months variable
 crimes1$monthRC <- factor(x = crimes1$month, 
                        labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                   "Jul" ,"Aug" ,"Sep" , "Oct", "Nov", "Dec"),
                        ordered = T)
 View(crimes1)
+
+# trying to filter to use only PHX zipcodes, but only returned 3331/16918 observations, 
+# this is definitely not right, as the highest count zip contains over 8,000 crimes
 crimes1.5 <- crimes1 %>% filter(zipcode == c(85003, 85004, 85006, 85007, 85008, 85009, 
                                                85012, 85013, 85014, 85015, 85016, 85017, 
                                                85018, 85019, 85020, 85021, 85022, 85023, 
@@ -91,6 +100,7 @@ crime.type <- ifelse(violent_crimes == 1, "violent", "nonviolent")
 crimes3 <- add_column(crimes3, crime.type)
 View(crimes3)
 
+
 phoenix_zips <- col(as.character(c(85003, 85004, 85006, 85007, 85008, 85009, 85012, 85013, 
                   85014, 85015, 85016, 85017, 85018, 85019, 85020, 85021, 
                   85022, 85023, 85024, 85026, 85027, 85028, 85029, 85031, 
@@ -100,13 +110,17 @@ phoenix_zips <- col(as.character(c(85003, 85004, 85006, 85007, 85008, 85009, 850
 
 ###UNDER CONSTRUCTION###
 
+# store variable
 premise <- crimes3$premise
-unique(premise) %>% length()
-length(unique(premise))
+
+# stores unique premise variable
 unique_premise <- unique(premise)
 length(unique_premise)
 unique_premise
-count(premise)
+
+crime_count_by_premise <- crimes4 %>% count(premise)
+
+View(crime_count_by_premise)
 
 residential_count <- length(which(premise == "SINGLE FAMILY HOUSE")) 
 residential_count2 <- length(which(premise == "SINGLE FAMILY HOUSING")) 

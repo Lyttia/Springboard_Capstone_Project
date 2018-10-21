@@ -142,13 +142,14 @@ getdata12 <- function(location_zip, date_start = "20160501",
                       limit = 5)
   return (df)
 }
-#---------------------->>>>>>>>>> START HERE <<<<<<<<<<----------------------------
+
 getdata12.5 <- function(location_zip, date_start = "20160516", 
                       date_end = "20160530"){
   df  = history_range(location_zip, date_start, date_end, 
                       limit = 5)
   return (df)
 }
+#---------------------->>>>>>>>>> START HERE <<<<<<<<<<----------------------------
 getdata13 <- function(location_zip, date_start = "20160601", 
                       date_end = "20160615"){
   df  = history_range(location_zip, date_start, date_end, 
