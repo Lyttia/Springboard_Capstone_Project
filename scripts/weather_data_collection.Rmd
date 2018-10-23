@@ -15,6 +15,7 @@ output: html_notebook
 #devtools::install_github("ALShum/rwunderground", force = TRUE, dependencies = TRUE)
 library(tidyverse)
 library(devtools)
+library(dplyr)
 library(rwunderground)
 # Set API key
 rwunderground::set_api_key("337b40a1234484ca")
@@ -24,32 +25,28 @@ WUNDERGROUNDID = '337b40a1234484ca'
 **1a- Create function to Call rwundergound API Package and produce PHX weather history df**
 
 ```{r}
-now <- Sys.time()
+#change zipcode assignment
 zip_code = as.character(unique(crimes$ZIP))
 View(zip_code)
+
+#change zipcodes
 location_zips = sapply(zip_code, set_location)
 View(location_zips)
+```
 
+
+```{r}
 getdata <- function(location_zip, date_start = "20151101", 
                     date_end = "20151102"){
                     df = history_range(location_zip, date_start, date_end, 
                                        limit = 10) 
                     return (df)
                     }
-
-weather_df_combined = do.call(rbind, lapply(location_zips, getdata))
-weather_df_combined <- tbl_df(weather_df_combined)
-View(weather_df_combined)
-```
-
-
-```{r}
 getdata2 <- function(location_zip, date_start = "20151103", 
                     date_end = "20151104"){
                     df  = history_range(location_zip, date_start, date_end, 
                                         limit = 10)
-                    if (now == 3:30:00) {Sys.sleep(14400)}
-                    else(return (df))
+                    return (df)
                     }
 getdata3 <- function(location_zip, date_start = "20151105", 
                     date_end = "20151107"){
@@ -150,65 +147,11 @@ getdata12.5 <- function(location_zip, date_start = "20160516",
   return (df)
 }
 #---------------------->>>>>>>>>> START HERE <<<<<<<<<<----------------------------
-getdata13 <- function(location_zip, date_start = "20160601", 
-                      date_end = "20160615"){
-  df  = history_range(location_zip, date_start, date_end, 
-                      limit = 5)
-  return (df)
-}
-getdata13.5 <- function(location_zip, date_start = "20160616", 
-                      date_end = "20160630"){
-  df  = history_range(location_zip, date_start, date_end, 
-                      limit = 5)
-  return (df)
-}
-getdata14 <- function(location_zip, date_start = "20160701", 
-                      date_end = "20160715"){
-  df  = history_range(location_zip, date_start, date_end, 
-                      limit = 5)
-  return (df)
-}
-getdata14.5 <- function(location_zip, date_start = "20160716", 
-                      date_end = "20160731"){
-  df  = history_range(location_zip, date_start, date_end, 
-                      limit = 5)
-  return (df)
-}
-getdata15 <- function(location_zip, date_start = "20160801", 
-                      date_end = "20160815"){
-  df  = history_range(location_zip, date_start, date_end, 
-                      limit = 5)
-  return (df)
-}
-getdata16 <- function(location_zip, date_start = "20160901", 
-                      date_end = "20160915"){
-  df  = history_range(location_zip, date_start, date_end, 
-                      limit = 5)
-  return (df)
-}
-getdata17 <- function(location_zip, date_start = "20161001", 
-                      date_end = "20161015"){
-  df  = history_range(location_zip, date_start, date_end, 
-                      limit = 5)
-  return (df)
-}
-getdata18 <- function(location_zip, date_start = "20161101", 
-                      date_end = "20161115"){
-  df  = history_range(location_zip, date_start, date_end, 
-                      limit = 5)
-  return (df)
-}
-getdata19 <- function(location_zip, date_start = "20161201", 
-                      date_end = "20161215"){
-  df  = history_range(location_zip, date_start, date_end, 
-                      limit = 5)
-  return (df)
-}
-
 ```
 
 
 ```{r}
+weather_df_combined = do.call(rbind, lapply(location_zips, getdata))
 weather_df_combined2 = do.call(rbind, lapply(location_zips, getdata2))
 weather_df_combined3 = do.call(rbind, lapply(location_zips, getdata3))
 weather_df_combined4 = do.call(rbind, lapply(location_zips, getdata4))
@@ -234,71 +177,68 @@ weather_df_combined11 = do.call(rbind, lapply(location_zips, getdata11))
 weather_df_combined11.5 = do.call(rbind, lapply(location_zips, getdata11.5))
 weather_df_combined12 = do.call(rbind, lapply(location_zips, getdata12))
 # stopped at: 20160504/q/85305
-#---------------------->>>>>>>>>> START HERE <<<<<<<<<<----------------------------
-weather_df_combined12.5 = do.call(rbind, lapply(location_zips, getdata12.5))
-weather_df_combined13 = do.call(rbind, lapply(location_zips, getdata13))
-weather_df_combined13.5 = do.call(rbind, lapply(location_zips, getdata13.5))
-weather_df_combined14 = do.call(rbind, lapply(location_zips, getdata14))
-weather_df_combined14.5 = do.call(rbind, lapply(location_zips, getdata14.5))
-weather_df_combined15 = do.call(rbind, lapply(location_zips, getdata15))
-weather_df_combined16 = do.call(rbind, lapply(location_zips, getdata16))
-weather_df_combined17 = do.call(rbind, lapply(location_zips, getdata17))
-weather_df_combined18 = do.call(rbind, lapply(location_zips, getdata18))
-weather_df_combined19 = do.call(rbind, lapply(location_zips, getdata19))
-
+#---------------------->>>>>>>>>> START HERE<<<<<<<<<<----------------------------
+rm(list=ls(pattern = "^getdata"))
 ```
 
 ```{r}
-weather_df_combined2 <- tbl_df(weather_df_combined2)
-weather_df_combined3 <- tbl_df(weather_df_combined3)
-weather_df_combined4 <- tbl_df(weather_df_combined4)
-weather_df_combined5 <- tbl_df(weather_df_combined5)
-weather_df_combined6 <- tbl_df(weather_df_combined6)
-weather_df_combined6.5 <- tbl_df(weather_df_combined6.5)
-weather_df_combined7 <- tbl_df(weather_df_combined7)
-weather_df_combined7.5 <- tbl_df(weather_df_combined7.5)
-weather_df_combined7.75 <- tbl_df(weather_df_combined7.75)
-weather_df_combined8 <- tbl_df(weather_df_combined8)
-weather_df_combined8.5 <- tbl_df(weather_df_combined8.5)
-weather_df_combined9 <- tbl_df(weather_df_combined9)
-weather_df_combined9.5 <- tbl_df(weather_df_combined9.5)
-weather_df_combined10 <- tbl_df(weather_df_combined10)
-weather_df_combined10.5 <- tbl_df(weather_df_combined10.5)
-weather_df_combined11 <- tbl_df(weather_df_combined11)
-weather_df_combined11.5 <- tbl_df(weather_df_combined11.5)
-weather_df_combined12 <- tbl_df(weather_df_combined12)
-weather_df_combined12.5 <- tbl_df(weather_df_combined12.5)
-weather_df_combined13 <- tbl_df(weather_df_combined13)
-weather_df_combined13.5 <- tbl_df(weather_df_combined13.5)
-weather_df_combined14 <- tbl_df(weather_df_combined14)
-weather_df_combined14.5 <- tbl_df(weather_df_combined14.5)
-weather_df_combined15 <- tbl_df(weather_df_combined15)
-weather_df_combined16 <- tbl_df(weather_df_combined16)
-weather_df_combined17 <- tbl_df(weather_df_combined17)
-weather_df_combined18 <- tbl_df(weather_df_combined18)
-weather_df_combined19 <- tbl_df(weather_df_combined19)
-
+w1 <- tbl_df(weather_df_combined)
+w2 <- tbl_df(weather_df_combined2)
+w3 <- tbl_df(weather_df_combined3)
+w4 <- tbl_df(weather_df_combined4)
+w5 <- tbl_df(weather_df_combined5)
+w6 <- tbl_df(weather_df_combined6)
+w6.5 <- tbl_df(weather_df_combined6.5)
+w7 <- tbl_df(weather_df_combined7)
+w7.5 <- tbl_df(weather_df_combined7.5)
+w7.75 <- tbl_df(weather_df_combined7.75)
+w8 <- tbl_df(weather_df_combined8)
+w8.5 <- tbl_df(weather_df_combined8.5)
+w9 <- tbl_df(weather_df_combined9)
+w9.5 <- tbl_df(weather_df_combined9.5)
+w10 <- tbl_df(weather_df_combined10)
+w10.5 <- tbl_df(weather_df_combined10.5)
+w11 <- tbl_df(weather_df_combined11)
+w11.5 <- tbl_df(weather_df_combined11.5)
+w12 <- tbl_df(weather_df_combined12)
+rm(list = ls(pattern = "^weather_df_combined"))
+gc()
 ```
 
 **1b- Join Weather dataframes**
 
 ```{r}
-weather_dfs_combined <- join(...)
-View(weather_dfs_combined)
+weather_2015dfs <- rbind(w1, w2, w3,w4, w5, w6, w6.5, w7, w7.5, w7.75)
+View(weather_2015dfs)
+weather_2016dfs <- rbind(w8, w8.5, w9, w9.5, w10, w10.5, w11, w11.5, w12)
 ```
 
 **2- Clean Variables/Column Names/Observations**
 
 ```{r}
-weather <- weather_df_combined %>%
+weather2015 <- weather_2015dfs %>%
   select('date', 'temp', 'cond') %>%
   separate("date", c("date", "time"), sep = " ") %>%
   separate("date", c("year", "month", "day"), sep = "-") %>%
   separate("time", c("hour"), sep = ":") %>% #discarded minutes for join
   rownames_to_column("zipcode")
 # adding row names to use for join
-weather$zipcode <- substr(weather$zipcode, 1, 5)
+weather2015$zipcode <- substr(weather2015$zipcode, 1, 5)
 # substring row names to use for join
 
-View(weather)
+View(weather2015)
+
+weather2016 <- weather_2016dfs %>%
+  select('date', 'temp', 'cond') %>%
+  separate("date", c("date", "time"), sep = " ") %>%
+  separate("date", c("year", "month", "day"), sep = "-") %>%
+  separate("time", c("hour"), sep = ":") %>% #discarded minutes for join
+  rownames_to_column("zipcode")
+# adding row names to use for join
+weather2016$zipcode <- substr(weather2016$zipcode, 1, 5)
+# substring row names to use for join
+
+View(weather2016)
+
+rm(list = ls(pattern = "^..."))
 ```
