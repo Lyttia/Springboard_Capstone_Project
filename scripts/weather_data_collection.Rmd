@@ -26,7 +26,7 @@ WUNDERGROUNDID = '337b40a1234484ca'
 
 ```{r}
 #change zipcode assignment
-zip_code = as.character(unique(crimes$ZIP))
+zip_code = as.character(unique(crimes$zipcode))
 View(zip_code)
 
 #change zipcodes
@@ -191,7 +191,7 @@ w6 <- tbl_df(weather_df_combined6)
 w6.5 <- tbl_df(weather_df_combined6.5)
 w7 <- tbl_df(weather_df_combined7)
 w7.5 <- tbl_df(weather_df_combined7.5)
-w7.75 <- tbl_df(weather_df_combined7.75)
+#w7.75 <- tbl_df(weather_df_combined7.75)
 w8 <- tbl_df(weather_df_combined8)
 w8.5 <- tbl_df(weather_df_combined8.5)
 w9 <- tbl_df(weather_df_combined9)
@@ -202,15 +202,15 @@ w11 <- tbl_df(weather_df_combined11)
 w11.5 <- tbl_df(weather_df_combined11.5)
 w12 <- tbl_df(weather_df_combined12)
 rm(list = ls(pattern = "^weather_df_combined"))
-gc()
 ```
 
 **1b- Join Weather dataframes**
 
 ```{r}
-weather_2015dfs <- rbind(w1, w2, w3,w4, w5, w6, w6.5, w7, w7.5, w7.75)
+weather_2015dfs <- rbind(w1, w2, w3,w4, w5, w6, w6.5, w7, w7.5)
 View(weather_2015dfs)
 weather_2016dfs <- rbind(w8, w8.5, w9, w9.5, w10, w10.5, w11, w11.5, w12)
+View(weather_2016dfs)
 ```
 
 **2- Clean Variables/Column Names/Observations**
@@ -227,6 +227,7 @@ weather2015$zipcode <- substr(weather2015$zipcode, 1, 5)
 # substring row names to use for join
 
 View(weather2015)
+write_csv(weather2015, "weather2015.csv")
 
 weather2016 <- weather_2016dfs %>%
   select('date', 'temp', 'cond') %>%
@@ -239,6 +240,8 @@ weather2016$zipcode <- substr(weather2016$zipcode, 1, 5)
 # substring row names to use for join
 
 View(weather2016)
+write_csv(weather2016, "weather2016.csv")
 
-rm(list = ls(pattern = "^..."))
+rm(list = ls(pattern = "^w"))
+gc()
 ```
