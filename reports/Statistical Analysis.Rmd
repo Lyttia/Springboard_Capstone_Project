@@ -4,22 +4,77 @@ author: "Lyttia Cancinos-McManus"
 date: "September 2, 2018"
 output: html_document
 ---
+
+# Install & Load Packages/Data
 ```{r}
 install.packages("ggplot2")
 library(ggplot2)
 library(tidyverse)
-crimes4 <- read.csv("crimes4.csv")
+crimes4 <- read_csv(file.choose())
+View(crimes4coord)
 ```
 
 1. Counts:
-Total number of crimes per zip code, ordered from highest crime count to lowest.Someone buying property might be interested in this plot.
+Total number of crimes per zip code, ordered from highest crime count to lowest.
 ```{r}
-crime_count_by_zip <- crimes4 %>% count(zipcode)
-crime_count_by_zip
-zipcodes <- table(crimes4$zipcode)
-zipcodes
-barplot(zipcodes[order(zipcodes, decreasing = TRUE)])
+crime_count_by_zip <- crimes4coord %>% 
+  select(City, zipcode) %>% 
+  count(zipcode)
 
+crime_count_by_zip
+
+usezips <- crime_count_by_zip %>% 
+  filter(n >= 10)
+View(usezips)
+
+zipcodes <- table(crimes4$zipcode)
+ordered_zipcodes <- order(zipcodes, decreasing = TRUE)
+ordered_zipcodes
+barplot(zipcodes[order(zipcodes, decreasing = TRUE)]) 
+
+
+g <- ggplot(crimes2016, aes(zipcode, decreasing = TRUE))
+g + geom_bar(aes(fill=category), width = 0.5) + 
+  theme(axis.text.x= element_text(angle = 65, vjust= 0.6)) + 
+  labs(title= "2016 Zipcode Frequency Bar Chart")
+ggsave("2016 Zipcode Frequency Bar Chart.png")
+
+
+g1.5 <- ggplot(crimes1.5, aes(zipcode))
+g1.5 + geom_bar(aes(fill=category), width = 0.5) + 
+  theme(axis.text.x= element_text(angle = 65, vjust= 0.6)) + 
+  labs(title= "Zipcode Frequency Bar Chart")
+ggsave("Zipcode Frequency Bar Chart- PHX zips only.png")
+```
+
+# Frequency of Burglary by zipcode (in descending order)
+
+```{r}
+df <- crimes4 %>% 
+  filter(category == "Burglary") %>% 
+  group_by(zipcode) %>%
+  summarise(n = n()) %>%
+  ungroup() %>%
+  arrange(desc(n))
+```
+
+# Using ggplot2
+
+```{r}
+ggplot(df, aes(x = reorder(zipcode, n), y = n)) + 
+  geom_point(size = 12, stat = "identity", color = "black") + 
+  geom_text(aes(label = n, fontface = "bold"), color = "white", size = 4) + 
+  coord_flip() + 
+  theme_minimal(base_size = 20) + 
+  xlab("") + ylab("") + 
+  ggtitle("Burglary offences in Greater Phoenix") +
+  scale_y_continuous(limits=c(0,max(df$n)))
+```
+
+# Save the dotplot as a png file
+
+```{r}
+ggsave("dotplot.png", scale = 2, dpi = 300)
 ```
 
 Total number of each category of crime. 
@@ -66,7 +121,7 @@ group_by(crimes2016, monthRC) %>%
 
 2. Trends (high, low, increase, decrease, anomalies):
 
-Zip code 85015 has the highest crime count at almost 9000 crimes (8965).
+Zip code 85015 has the highest crime count total at almost 9000 crimes (8965).
 
 Multiple zip codes have only 1 crime... should these zips be included? 
 
@@ -97,17 +152,38 @@ ggplot(data = crimes2017, aes(x = monthRC)) +
     ylab("Crime Count")
 
 #----------------Total Crimes by Month 2017 (order decr)-----------------------
-dplyr::count(crimes2017, monthRC) %>% 
+orderedmonths <- dplyr::count(crimes2017, monthRC) %>% 
   arrange(-n) %>% 
-  mutate(monthRC = factor(monthRC, monthRC)) %>% 
-  ggplot(aes(x = monthRC, y = n)) + 
-  geom_bar(stat = "identity", fill = "lightblue", width = 0.75) + 
+  mutate(monthRC = factor(monthRC, monthRC)) 
+orderedmonths_list <- c("Oct", "Aug", "Jul", "May", "Jan", "Jun", "Dec", "Mar", "Nov", "Apr", "Sep", "Feb")
+  
+ggplot(crimes2017, aes(x = monthRC)) + 
+  geom_bar(stat = "count", fill = "lightblue", width = 0.75) + 
+  scale_x_discrete (limits = orderedmonths_list) +
+  geom_text(stat = "count", aes(label=..count..), vjust=-0.5) +
   my_theme +
   ggtitle("Crimes reported to Phoenix PD each Month in 2017") +
   xlab("Month (ordered by crime count)") +
   ylab("Crime Count")
 
 ggsave("crime_count_by_month2017.png")
+
+#----------------Total Crimes by Month 2016 (order decr)-----------------------
+orderedmonths2016 <- dplyr::count(crimes2016, monthRC) %>% 
+  arrange(-n) %>% 
+  mutate(monthRC = factor(monthRC, monthRC)) 
+orderedmonths2016_list <- c("Dec", "Aug", "Oct", "Jan", "Nov", "Apr", "Jun", "Sep", "May", "Jul", "Mar", "Feb")
+  
+ggplot(crimes2016, aes(x = monthRC)) + 
+  geom_bar(stat = "count", fill = "lightblue", width = 0.75) + 
+  scale_x_discrete (limits = orderedmonths2016_list) +
+  geom_text(stat = "count", aes(label=..count..), vjust=-0.5) +
+  my_theme +
+  ggtitle("Crimes reported to Phoenix PD each Month in 2016") +
+  xlab("Month (ordered by crime count)") +
+  ylab("Crime Count")
+
+ggsave("crime_count_by_month2016.png")
 ```
 
 Are any categories more prevelant at a certain time?
@@ -160,6 +236,10 @@ plot(count(upperhousing, median_value), upperhousing$median_value)
 
 reg()
 
+ccountupperhousing <- count(upperhousing, median_value)
+upperhousing2 <- left_join(upperhousing, ccountupperhousing)
+
+
 ```
 
 4. Comparisons:
@@ -173,7 +253,23 @@ barplot(zipcodes[order(crimes4$median_value, decreasing = TRUE)])
 Scatterplots:
 
 ```{r}
+# install.packages("ggplot2")
+# load package and data
+options(scipen=999)  # turn-off scientific notation like 1e+48
+library(ggplot2)
+theme_set(theme_bw())  # pre-set the bw theme.
 
+# Scatterplot
+gg <- ggplot(upperhousing2, aes(x = as.numeric(median_value), y = n)) + 
+  geom_point(aes(col = category)) + 
+  labs(subtitle="Scatterplot", 
+       y="Crime Count", 
+       x="Property Value", 
+       title="Crime Count by Property Value", 
+       caption = "Source: Phoenix Open Data")
+
+plot(gg)
+ggsave("crime_count_by_property_value_upper.png")
 ```
 
 5. Can you make a time-series plot?

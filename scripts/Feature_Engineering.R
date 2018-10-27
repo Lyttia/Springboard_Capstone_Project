@@ -8,7 +8,7 @@ crimes_joined <- read_csv(crimes_joined)
 View(crimes_joined)
 colSums(is.na(crimes_joined))
 
-# 5- Create Dummy Variables================================================
+# 5- Create Crime Category Dummy Variables =======================================================
 
 category <- factor(crimes_joined$category)
 
@@ -51,7 +51,7 @@ str(crimes_joined)
 
 write_csv(crimes_joined, "tempcrimesfortestingmodel.csv")
 
-###UNDER CONSTRUCTION###
+# 6- Create Premise Categories & Dummy Variables ===============================================
 
 # store premise variable
 premise <- crimes_joined$premise
@@ -62,42 +62,46 @@ length(unique_premise)
 unique_premise
 
 #counts each premise type occurance to plot
-crime_count_by_premise <- crimes %>% count(premise) %>% arrange(-n)
-write_csv(crime_count_by_premise, "premise_count.csv")
+crime_count_by_premise <- crimes_joined %>% count(premise) %>% arrange(-n)
+#write_csv(crime_count_by_premise, "premise_count.csv")
 head(crime_count_by_premise)
 
-g <- ggplot(crimes, aes(premise, decreasing = TRUE))
+g <- ggplot(crimes_joined, aes(premise, decreasing = TRUE))
 g + geom_bar(aes(fill=category), width = 0.5) + 
   theme(axis.text.x= element_text(angle = 65, vjust= 0.6)) + 
   labs(title= "Premise Frequency Bar Chart")
 ggsave("Premise Frequency Bar Chart.png")
 
 #make table to order for ordered bar plot
-premise_table <- table(crimes$premise)
+premise_table <- table(crimes_joined$premise)
 ordered_premise <- order(premise_table, decreasing = TRUE)
-View(ordered_premise)
+head(ordered_premise)
 barplot(premise_table[ordered_premise])
 
-#all of these premise types are incomprehensible
-#combine premise types since many are redundant
-levels(premise)
-#NULL
+# all of these premise types are incomprehensible
+# combine premise types since many are redundant and 
+# Random Forest can only handle 53 or less categories
+
+
+###UNDER CONSTRUCTION###
 str(premise)
+levels(premise)
 
-#character strings
+#EXAMPLE:
+#df$col_01 <- +(grepl("dog|cat|rat", df$col_one))
 
-crimes$residence <- 
+crimes_joined$house <- +(grepl("SINGLE FAMILY HOUSE|SINGLE FAMILY HOUSING|
+                               FENCED RESIDENTIAL YARD", crimes_joined$premise))
+#crimes_joined$edu_facility <- +(grepl("SCHOOL/COLLEGE/CHILD CARE|CHILD CARE / DAY CARE|
+                             SCHOOL-COLLEGE/UNIVERSITY|SCHOOL-ELEMENTARY/SECONDARY|, 
+                             crimes_joined$premise))
+crimes_joined$edu_facility <- +(grepl("SCHOOL|CHILD", crimes_joined$premise))
 
-house/residence = c("SINGLE FAMILY HOUSE","SINGLE FAMILY HOUSING",
-                      "FENCED RESIDENTIAL YARD")
-school  = c("SCHOOL/COLLEGE/CHILD CARE","CHILD CARE / DAY CARE",
-              "SCHOOL-COLLEGE/UNIVERSITY","SCHOOL-ELEMENTARY/SECONDARY")
+View(crimes_joined)
+
 apartment = c("APARTMENT")
 condotownhouse = c("CONDO / TOWNHOUSE")
 hotelmotel = c("HOTEL / MOTEL")
-  
-
-
   
 premise_categories <- sapply(premise, combine_premise)
 
