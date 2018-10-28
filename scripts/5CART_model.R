@@ -120,3 +120,21 @@ table(Test$violent_crimes, PredictCV)
 # [1] 0.8604666
 
 # cp stayed the same, and accuracy did not change 
+
+# display indicator importance
+# make dataframe from importance() output
+feat_imp_df <- importance(CrimeForest) %>% 
+  data.frame() %>% 
+  mutate(feature = row.names(.)) 
+
+# plot dataframe
+ggplot(feat_imp_df, aes(x = reorder(feature, MeanDecreaseGini), 
+                        y = MeanDecreaseGini)) +
+  geom_bar(stat='identity') +
+  coord_flip() +
+  theme_classic() +
+  labs(
+    x     = "Feature",
+    y     = "Importance",
+    title = "Feature Importance: CrimeForest"
+  )
