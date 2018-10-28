@@ -10,6 +10,8 @@
 #install.packages("rpart.plot")
 #install.packages("randomForest")
 #install.packages("car")
+#install.packages("caret")
+#install.packages("e1071")
 
 # Load packages: 
 # Packages must be loaded in this order:
@@ -23,3 +25,4 @@ library(caTools)
 library(randomForest)
 library(missForest)
 library(car)
+
