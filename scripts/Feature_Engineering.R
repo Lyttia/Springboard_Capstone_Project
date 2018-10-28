@@ -49,8 +49,6 @@ colSums(is.na(crimes_joined))
 
 str(crimes_joined)
 
-write_csv(crimes_joined, "tempcrimesfortestingmodel.csv")
-
 # 6- Create Premise Categories & Dummy Variables ===============================================
 
 # store premise variable
@@ -62,7 +60,8 @@ length(unique_premise)
 unique_premise
 
 #counts each premise type occurance to plot
-crime_count_by_premise <- crimes_joined %>% count(premise) %>% arrange(-n)
+crime_count_by_premise <- crimes_joined %>% count(premise) %>% 
+  arrange(-n)
 #write_csv(crime_count_by_premise, "premise_count.csv")
 head(crime_count_by_premise)
 
@@ -82,70 +81,55 @@ barplot(premise_table[ordered_premise])
 # combine premise types since many are redundant and 
 # Random Forest can only handle 53 or less categories
 
-###UNDER CONSTRUCTION###
 str(premise)
 levels(premise)
 
 # Create dummy variables
-crimes_joined$singl_fam_home <- +(grepl("FAMILY|RESIDENTIAL", crimes_joined$premise))
+crimes_joined$singl_fam_home <- +(grepl("FAMILY|RESIDENTIAL",
+                                        crimes_joined$premise))
 
-crimes_joined$edu_facility <- +(grepl("SCHOOL|CHILD|UNIVERSITY", crimes_joined$premise))
+crimes_joined$edu_facility <- +(grepl("SCHOOL|CHILD|UNIVERSITY",
+                                      crimes_joined$premise))
 
-crimes_joined$unknown <- +(grepl("UNKNOWN|unknown|OTHER", crimes_joined$premise))
+crimes_joined$unknown <- +(grepl("UNKNOWN|unknown|OTHER",
+                                 crimes_joined$premise))
 
-crimes_joined$public_trans <- +(grepl("TRAIN|RAIL|PARK AND RIDE|DOCK|BUS|", crimes_joined$premise))
+crimes_joined$public_trans <- +(grepl("TRAIN|RAIL|PARK AND RIDE|DOCK|BUS|",
+                                      crimes_joined$premise))
 
-crimes_joined$medical_facility <- +(grepl("MEDICAL|NURSING|HOSPITAL", crimes_joined$premise))
+crimes_joined$medical_facility <- +(grepl("MEDICAL|NURSING|HOSPITAL",
+                                          crimes_joined$premise))
 
-crimes_joined$natl_envnmt <- +(grepl("DESERT|MOUNTAIN|FIELD|RIVER", crimes_joined$premise))
+crimes_joined$natl_envnmt <- +(grepl("DESERT|MOUNTAIN|FIELD|RIVER",
+                                     crimes_joined$premise))
 
 # Recode premise type levels
-crimes_joined$premise <- recode(crimes_joined$premise, "c('07A STOREROOM/SHED (RESIDENTIAL)','CARPORT',
-                                'DRIVEWAY','FENCED RESIDENTIAL YARD','GARAGE / CARPORT','GARAGE',
-                                'SINGLE FAMILY HOUSING','SINGLE FAMILY HOUSE')='single family home';
-                                c('UNKNOWN','unknown','OTHER','FOJ - PREMISE UNKNOWN')='unknown';
-                                c('SCHOOL-COLLEGE/UNIVERSITY','SCHOOL-ELEMENTARY/SECONDARY',
-                                'SCHOOL-OTHER','SCHOOL/COLLEGE/CHILD CARE','CHILD CARE / DAY CARE')=
-                                'edu_facility';c('HOSPITAL','HOSPITIAL / NURSING CARE','NURSING CARE',
-                                'MEDICAL OFFICE')='medical_facility';c('BUS','BUS / LIGHT RAIL',
-                                'BUS / RAIL STATION','BUS FACILITY','BUS STATION','BUS STOP',
-                                'DOCK/WHARF/FREIGHT/MODAL TERMINAL','LIGHT RAIL','LIGHT RAIL FACILITY',
-                                'LIGHT RAIL PLATFORM','LIGHT RAIL TRAIN','PARK AND RIDE', 'RAIL STATION',
-                                'RAIL STOP','TRAIN STATION')='public_trans';c('RIVER BOTTOM',
-                                'OPEN SPACE / DESERT','MOUNTAIN AREA','FIELD/WOODS')='natl_envnmt';
-                                c('THEATRE','DRIVE-IN MOVIE')='movies';c('STREET / ROADWAY / ALLEY / SIDEWALK',
-                                'STREET / ROADWAY / ALLEY SIDEWALK')='strt_road_alley_sdwlk';c('PARKING LOT',
-                                'PARKING GARAGE')='parking'")
+crimes_joined$premise <- recode(crimes_joined$premise, 
+"c('07A STOREROOM/SHED (RESIDENTIAL)','CARPORT','DRIVEWAY',
+'FENCED RESIDENTIAL YARD','GARAGE / CARPORT','GARAGE',
+'SINGLE FAMILY HOUSING','SINGLE FAMILY HOUSE','EASEMENT')=
+'single family home';
+c('UNKNOWN','unknown','OTHER','FOJ - PREMISE UNKNOWN')=
+'unknown';
+c('SCHOOL-COLLEGE/UNIVERSITY','SCHOOL-ELEMENTARY/SECONDARY',
+'SCHOOL-OTHER','SCHOOL/COLLEGE/CHILD CARE','CHILD CARE / DAY CARE')=
+'edu_facility';
+c('HOSPITAL','HOSPITIAL / NURSING CARE','NURSING CARE',
+'MEDICAL OFFICE')='medical_facility';
+c('BUS','BUS / LIGHT RAIL','BUS / RAIL STATION','BUS FACILITY',
+'BUS STATION','BUS STOP','DOCK/WHARF/FREIGHT/MODAL TERMINAL',
+'LIGHT RAIL','LIGHT RAIL FACILITY','LIGHT RAIL PLATFORM',
+'LIGHT RAIL TRAIN','PARK AND RIDE', 'RAIL STATION','RAIL STOP',
+'TRAIN STATION')='public_trans';
+c('RIVER BOTTOM','OPEN SPACE / DESERT','MOUNTAIN AREA','FIELD/WOODS')=
+'natl_envnmt';
+c('THEATRE','DRIVE-IN MOVIE')='movies';
+c('STREET / ROADWAY / ALLEY / SIDEWALK','STREET / ROADWAY / ALLEY SIDEWALK')=
+'strt_road_alley_sdwlk';c('PARKING LOT','PARKING GARAGE')='parking';
+c('LOAN / FINANCE COMPANY','BANK / SAVINGS / CREDIT UNION','ATM SEPARATE FROM BANK')=
+'financial_facilities';c('RESTAURANT','FAST FOOD STORE')='food_service'")
 
 levels(crimes_joined$premise)
-View(crimes_joined$premise)
+View(crimes_joined)
 
-apartment = c("APARTMENT")
-condotownhouse = c("CONDO / TOWNHOUSE")
-hotelmotel = c("HOTEL / MOTEL")
-  
-premise_categories <- sapply(premise, combine_premise)
-
-# Add premise_categories column to df
-
-crimes <- add_column(crimes, premise_categories)  
-
-# Create premise_categories dummy variables 
-
-single_family_residence <- ifelse(premise_categories == 
-                                    "single_family_residence", 1, 0)
-
-schools_childcare <- ifelse(premise_categories == "schools_childcare", 1, 0) 
-
-apartment <- ifelse(premise_categories == "APARTMENT", 1, 0)
-
-condo_townhouse <- ifelse(premise_categories == "CONDO / TOWNHOUSE", 1, 0)
-
-# Add premise_categories dummy variables to df
-
-crimes3 <- add_column(crimes3, single_family_residence, schools_childcare, 
-                      apartment, condo_townhouse,... )  
-
-###END CONSTRUCTION###
-
-gc()
+write_csv(crimes_joined, "tempcrimesfortestingmodel.csv")

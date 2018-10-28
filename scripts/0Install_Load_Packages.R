@@ -9,9 +9,10 @@
 #install.packages("rpart")
 #install.packages("rpart.plot")
 #install.packages("randomForest")
-install.packages("car")
+#install.packages("car")
 
 # Load packages: 
+# Packages must be loaded in this order:
 
 library(tidyverse)
 library(devtools)
