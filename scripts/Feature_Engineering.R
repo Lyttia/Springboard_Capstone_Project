@@ -82,22 +82,43 @@ barplot(premise_table[ordered_premise])
 # combine premise types since many are redundant and 
 # Random Forest can only handle 53 or less categories
 
-
 ###UNDER CONSTRUCTION###
 str(premise)
 levels(premise)
 
-#EXAMPLE:
-#df$col_01 <- +(grepl("dog|cat|rat", df$col_one))
+# Create dummy variables
+crimes_joined$singl_fam_home <- +(grepl("FAMILY|RESIDENTIAL", crimes_joined$premise))
 
-crimes_joined$house <- +(grepl("SINGLE FAMILY HOUSE|SINGLE FAMILY HOUSING|
-                               FENCED RESIDENTIAL YARD", crimes_joined$premise))
-#crimes_joined$edu_facility <- +(grepl("SCHOOL/COLLEGE/CHILD CARE|CHILD CARE / DAY CARE|
-                             SCHOOL-COLLEGE/UNIVERSITY|SCHOOL-ELEMENTARY/SECONDARY|, 
-                             crimes_joined$premise))
-crimes_joined$edu_facility <- +(grepl("SCHOOL|CHILD", crimes_joined$premise))
+crimes_joined$edu_facility <- +(grepl("SCHOOL|CHILD|UNIVERSITY", crimes_joined$premise))
 
-View(crimes_joined)
+crimes_joined$unknown <- +(grepl("UNKNOWN|unknown|OTHER", crimes_joined$premise))
+
+crimes_joined$public_trans <- +(grepl("TRAIN|RAIL|PARK AND RIDE|DOCK|BUS|", crimes_joined$premise))
+
+crimes_joined$medical_facility <- +(grepl("MEDICAL|NURSING|HOSPITAL", crimes_joined$premise))
+
+crimes_joined$natl_envnmt <- +(grepl("DESERT|MOUNTAIN|FIELD|RIVER", crimes_joined$premise))
+
+# Recode premise type levels
+crimes_joined$premise <- recode(crimes_joined$premise, "c('07A STOREROOM/SHED (RESIDENTIAL)','CARPORT',
+                                'DRIVEWAY','FENCED RESIDENTIAL YARD','GARAGE / CARPORT','GARAGE',
+                                'SINGLE FAMILY HOUSING','SINGLE FAMILY HOUSE')='single family home';
+                                c('UNKNOWN','unknown','OTHER','FOJ - PREMISE UNKNOWN')='unknown';
+                                c('SCHOOL-COLLEGE/UNIVERSITY','SCHOOL-ELEMENTARY/SECONDARY',
+                                'SCHOOL-OTHER','SCHOOL/COLLEGE/CHILD CARE','CHILD CARE / DAY CARE')=
+                                'edu_facility';c('HOSPITAL','HOSPITIAL / NURSING CARE','NURSING CARE',
+                                'MEDICAL OFFICE')='medical_facility';c('BUS','BUS / LIGHT RAIL',
+                                'BUS / RAIL STATION','BUS FACILITY','BUS STATION','BUS STOP',
+                                'DOCK/WHARF/FREIGHT/MODAL TERMINAL','LIGHT RAIL','LIGHT RAIL FACILITY',
+                                'LIGHT RAIL PLATFORM','LIGHT RAIL TRAIN','PARK AND RIDE', 'RAIL STATION',
+                                'RAIL STOP','TRAIN STATION')='public_trans';c('RIVER BOTTOM',
+                                'OPEN SPACE / DESERT','MOUNTAIN AREA','FIELD/WOODS')='natl_envnmt';
+                                c('THEATRE','DRIVE-IN MOVIE')='movies';c('STREET / ROADWAY / ALLEY / SIDEWALK',
+                                'STREET / ROADWAY / ALLEY SIDEWALK')='strt_road_alley_sdwlk';c('PARKING LOT',
+                                'PARKING GARAGE')='parking'")
+
+levels(crimes_joined$premise)
+View(crimes_joined$premise)
 
 apartment = c("APARTMENT")
 condotownhouse = c("CONDO / TOWNHOUSE")

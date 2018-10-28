@@ -9,6 +9,7 @@
 #install.packages("rpart")
 #install.packages("rpart.plot")
 #install.packages("randomForest")
+install.packages("car")
 
 # Load packages: 
 
@@ -20,3 +21,4 @@ library(rpart.plot)
 library(caTools)
 library(randomForest)
 library(missForest)
+library(car)
