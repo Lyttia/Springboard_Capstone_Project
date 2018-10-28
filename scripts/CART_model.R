@@ -23,7 +23,10 @@ split = sample.split(treedata$violent_crimes, SplitRatio = 0.7)
 Train = subset(treedata, split == TRUE)
 Test = subset(treedata, split == FALSE)
 
-CrimesTree = rpart(violent_crimes ~ month + hour + median_value + premise + total_listed, data = Train, method ="class", control = rpart.control(minbucket = 25))
+CrimesTree = rpart(violent_crimes ~ month + day + hour + premise + monthRC + 
+                   median_value + total_listed + singl_fam_home + edu_facility +
+                   unknown + public_trans + medical_facility + natl_envnmt,
+                   data = Train, method ="class", control = rpart.control(minbucket = 25))
 prp(CrimesTree)
 
 PredictCART = predict(CrimesTree, newdata = Test, type = "class")
@@ -75,17 +78,45 @@ Test$violent_crimes = as.factor(Test$violent_crimes)
 str(Test)
 
 # Random Forest model
-CrimeForest = randomForest(violent_crimes ~ month + hour + median_value + total_listed, data = Train, nodesize = 25, ntree=200)
+CrimeForest = randomForest(violent_crimes ~ month + day + hour + premise + monthRC + 
+                             median_value + total_listed + singl_fam_home + edu_facility +
+                             unknown + public_trans + medical_facility + natl_envnmt, data = Train, nodesize = 25, ntree=200)
+
+print(CrimeForest)
+importance(CrimeForest)
+varImpPlot(CrimeForest)
+
 PredictForest = predict(CrimeForest, newdata = Test)
 table(Test$violent_crimes, PredictForest)
-PredictForest
+# PredictForest
 #     0     1
-# 0 41099    27
-# 1  6658    11
+# 0 41125    1
+# 1  6668    1
 
-(41099+11)/(41099+27+6658+11)
-# 0.8601318
+(41125+1)/(41125+1+6668+1)
+# 0.8604666
 
-#Not ready yet:
-#CrimeForest = randomForest(violent_crimes ~ month + hour + median_value + total_listed + premise, data = Train, nodesize = 25, ntree=200)
-#WARNING: Can not handle categorical predictors with more than 53 categories.
+library(caret)
+library(e1071)
+
+#define cross validation exp, make sure we are using the best complexity parameter value
+fitControl= trainControl(method="cv", number=10)
+cartGrid = expand.grid(.cp=(1:50)*0.01)
+train(violent_crimes ~ month + day + hour + premise + monthRC + 
+        median_value + total_listed + singl_fam_home + edu_facility +
+        unknown + public_trans + medical_facility + natl_envnmt, data=Train, method="rpart", trControl=fitControl, tuneGrid=cartGrid)
+
+CrimesTreeCV = rpart(violent_crimes ~ month + day + hour + premise + monthRC + 
+                       median_value + total_listed + singl_fam_home + edu_facility +
+                       unknown + public_trans + medical_facility + natl_envnmt,method = "class", data = Train, control = rpart.control(cp = 0.5))
+PredictCV = predict(CrimesTreeCV, newdata = Test, type = "class")
+table(Test$violent_crimes, PredictCV)
+#   PredictCV
+#        0     1
+#  0 41126     0
+#  1  6669     0
+
+41126/(41126+6669)
+# [1] 0.8604666
+
+# cp stayed the same, and accuracy did not change 
