@@ -2,10 +2,8 @@
 
 # Install & Load packages
 library(tidyverse)
-install.packages("maptools")
 library(maptools)
 library(ggplot2)
-if(!requireNamespace("devtools")) install.packages("devtools")
 devtools::install_github("dkahle/ggmap", ref = "tidyup", dependencies = T)
 library(ggmap)
 
@@ -21,7 +19,7 @@ colors <- brewer.pal(9, "BuGn")
 
 # set up PHX base map from Google Map Static API
 # must obtain API key from Google, assign to project, and enable billing
-register_google(key = "AIzaSyDyUl434XV34WQoc3sHq9cfUCjltdlAvuI")
+register_google(key = hidden)
 
 # store phx base map image
 mapImage <- get_map(location = c(lon = -112.1, lat = 33.52), zoom = 11, 
@@ -93,9 +91,10 @@ contours <- stat_density2d(
 crimedensity_byzip <- ggmap(mapImage, extent='device') + 
   contours +
   scale_alpha_continuous(range=c(0.25,0.4), guide='none') +
-  scale_fill_gradient('Violent\nCrime\nDensity')+
+  scale_fill_gradient('Crime\nDensity')+
   ggtitle('Crime Density in Phoenix') 
 
+crimedensity_byzip
   ggsave("Crime Density by Zip.png")
 # Warning message:
 # Removed 11215 rows containing non-finite values (stat_density2d).
