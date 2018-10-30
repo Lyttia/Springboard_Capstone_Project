@@ -1,8 +1,7 @@
 # Feature Engineering
 
-# Make sure you have run the 0Install/Load packages at the start of each new session
+# load data crimes_joined.csv from local machine or data file folder in github 
 
-# load data crimes_complete.csv from local machine or data file folder in my github repo
 crimes_joined <- file.choose()
 crimes_joined <- read_csv(crimes_joined)
 View(crimes_joined)
@@ -52,39 +51,30 @@ str(crimes_joined)
 # 6- Create Premise Categories & Dummy Variables ===============================================
 
 # store premise variable
+
 premise <- crimes_joined$premise
-
-# stores unique premise var to count how many premise types are represented in the data
-unique_premise <- unique(premise)
-length(unique_premise)
-unique_premise
-
-#counts each premise type occurance to plot
-crime_count_by_premise <- crimes_joined %>% count(premise) %>% 
-  arrange(-n)
-#write_csv(crime_count_by_premise, "premise_count.csv")
-head(crime_count_by_premise)
-
-g <- ggplot(crimes_joined, aes(premise, decreasing = TRUE))
-g + geom_bar(aes(fill=category), width = 0.5) + 
-  theme(axis.text.x= element_text(angle = 65, vjust= 0.6)) + 
-  labs(title= "Premise Frequency Bar Chart")
-ggsave("Premise Frequency Bar Chart.png")
-
-#make table to order for ordered bar plot
-premise_table <- table(crimes_joined$premise)
-ordered_premise <- order(premise_table, decreasing = TRUE)
-head(ordered_premise)
-barplot(premise_table[ordered_premise])
+str(premise)
+levels(premise)
 
 # all of these premise types are incomprehensible
 # combine premise types since many are redundant and 
 # Random Forest can only handle 53 or less categories
 
-str(premise)
-levels(premise)
+# stores unique premise var to count how many premise types are represented in the data
+
+unique_premise <- unique(premise)
+length(unique_premise)
+unique_premise
+
+#counts each premise type occurance to analyze for combination
+
+crime_count_by_premise <- crimes_joined %>% count(premise) %>% 
+  arrange(-n)
+
+#write_csv(crime_count_by_premise, "premise_count.csv")
 
 # Create dummy variables
+
 crimes_joined$singl_fam_home <- +(grepl("FAMILY|RESIDENTIAL",
                                         crimes_joined$premise))
 
@@ -104,6 +94,8 @@ crimes_joined$natl_envnmt <- +(grepl("DESERT|MOUNTAIN|FIELD|RIVER",
                                      crimes_joined$premise))
 
 # Recode premise type levels
+# library(car)
+
 crimes_joined$premise <- recode(crimes_joined$premise, 
 "c('07A STOREROOM/SHED (RESIDENTIAL)','CARPORT','DRIVEWAY',
 'FENCED RESIDENTIAL YARD','GARAGE / CARPORT','GARAGE',
@@ -130,6 +122,5 @@ c('LOAN / FINANCE COMPANY','BANK / SAVINGS / CREDIT UNION','ATM SEPARATE FROM BA
 'financial_facilities';c('RESTAURANT','FAST FOOD STORE')='food_service'")
 
 levels(crimes_joined$premise)
-View(crimes_joined)
 
 write_csv(crimes_joined, "tempcrimesfortestingmodel.csv")

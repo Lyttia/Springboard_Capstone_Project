@@ -29,4 +29,5 @@ colSums(is.na(crimes_joined))
 str(crimes_joined)
 
 # save data file for feature engineering
+
 write_csv(crimes_joined, "crimes_joined.csv")

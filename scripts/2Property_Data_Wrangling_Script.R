@@ -26,29 +26,37 @@ property <- property %>%
   select(-"day")
 
 # change year to factor for join
+
 property$year <- as_factor(property$year)
 
 # change month to factor for join
+
 property$month <- as_factor(property$month)
 
 # change total listed for analysis
+
 property$total_listed <- as.integer(property$total_listed)
 
 # change median value for analysis
+
 property$median_value <- as.numeric(property$median_value)
 
 # filter for phx zipcodes
+
 property <- property %>% filter(str_detect(zipcode, "^850"))
 
 property$zipcode <- as.integer(property$zipcode)
 
 # check for missing values
+
 colSums(is.na(property))
 
 # Calculate the mean of the listing column and use that value to populate the missing values
+
 list_mean <- mean(property$total_listed, na.rm = TRUE)
 
 property$total_listed[c(which(is.na(property$total_listed)))] <- list_mean
+
 str(property)
 
 # save cleaned up property file
