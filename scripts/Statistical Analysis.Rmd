@@ -15,54 +15,22 @@ library(tidyverse)
 ```{r}
 crimes <- file.choose()
 crimes <- read_csv(crimes)
-str(crimes)
+
 # parsing corrections:
 crimes$monthRC <- factor(x = crimes$month, 
                        labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
                                   "Jul" ,"Aug" ,"Sep" , "Oct", "Nov", "Dec"),
                        ordered = T)
 crimes <- crimes %>% 
-  mutate_if(is.character, as.factor)
-str(crimes)
+  mutate_if(is.character, as.factor) %>% 
+  mutate_if(is.integer, as.factor)
+
 ```
 
 1. Counts:
+We have kept a total of 159,319 crime observations that have been reported to Phoenix Police Department within Phoenix zipcodes between November 1st, 2015 to June 25th, 2018.
 
-_Counting Zipcodes_
-*2 methods to count and show zipcodes being analyzed* 
-```{r}
-all_zipcodes <- crimes %>% distinct(zipcode) 
-View(all_zipcodes)
-
-crimes %>% group_by(zipcode) %>% summarise()
-```
-*Using 43 zipcodes total for analysis out of orig 102 from phx crime data*
-
-_Counting crimes per zip-code_
-*to return a count of the number of crimes reported in each zip-code*
-```{r}
-crime_count_by_zip <- crimes %>% 
-  count(zipcode)
-crime_count_by_zip
-```
-
-_Exploratory Ordered Count_
-*Zipcodes ordered from highest crime count to lowest.*
-```{r}
-zipcodes <- table(crimes$zipcode)
-ordered_zipcodes <- order(zipcodes, decreasing = TRUE)
-ordered_zipcodes
-barplot(zipcodes[order(zipcodes, decreasing = TRUE)]) 
-```
-_Descriptive Plot: ggplot_
-```{r}
-g1.5 <- ggplot(crimes, aes(zipcode))
-g1.5 + geom_bar(aes(fill=category), width = 0.5) + 
-  theme(axis.text.x= element_text(angle = 65, vjust= 0.6)) + 
-  labs(title= "Zipcode Frequency Bar Chart")
-#ggsave("Zipcode Frequency Bar Chart- PHX zips only.png")
-```
-
+How many crimes occur each month in 2016 and 2017?
 _Counting crime per month_
 *Number of crimes each month in 2017 and 2016.* 
 ```{r}
@@ -89,15 +57,77 @@ group_by(crimes2016, monthRC) %>%
     arrange(desc(count))
 ```
 
+How many zipcodes do we have?
+_Counting Zipcodes_
+*show zipcodes* 
+```{r}
+crimes %>% group_by(zipcode) %>% summarise()
+```
+*Using 43 zipcodes total for analysis out of orig 102 from PPD crime data*
+
+How many crimes are reported for each zipcode?
+_Counting crimes per zip-code_
+*to return a count of the number of crimes reported in each zip-code*
+```{r}
+crime_count_by_zip <- crimes %>% 
+  count(zipcode)
+crime_count_by_zip
+```
+
+_Descriptive Plot: ggplot_
+*Crime count per zipcode, colored by crime type.*
+```{r}
+g1.5 <- ggplot(crimes, aes(zipcode))
+g1.5 + geom_bar(aes(fill=category), width = 0.5) + 
+  theme(axis.text.x= element_text(angle = 65, vjust= 0.6)) + 
+  labs(title= "Zipcode Frequency Bar Chart")
+#ggsave("Zipcode Frequency Bar Chart- PHX zips only.png")
+```
+
+_Crime count by zip in 2016_
 ```{r}
 g <- ggplot(crimes2016, aes(zipcode, decreasing = TRUE))
 g + geom_bar(aes(fill=category), width = 0.5) + 
   theme(axis.text.x= element_text(angle = 65, vjust= 0.6)) + 
   labs(title= "2016 Zipcode Frequency Bar Chart")
-ggsave("2016 Zipcode Frequency Bar Chart.png")
+#ggsave("2016 Zipcode Frequency Bar Chart.png")
+```
+
+_Crime count by zip in 2017_
+```{r}
+g <- ggplot(crimes2017, aes(zipcode, decreasing = TRUE))
+g + geom_bar(aes(fill=category), width = 0.5) + 
+  theme(axis.text.x= element_text(angle = 65, vjust= 0.6)) + 
+  labs(title= "2017 Zipcode Frequency Bar Chart")
+#ggsave("2017 Zipcode Frequency Bar Chart.png")
 ```
 
 
+Which zipcodes are high crime count and which are low?
+_Exploratory Ordered Count_
+*Zipcodes ordered from highest crime count to lowest.*
+```{r}
+zipcodes <- table(crimes$zipcode)
+ordered_zipcodes <- order(zipcodes, decreasing = TRUE)
+ordered_zipcodes
+barplot(zipcodes[order(zipcodes, decreasing = TRUE)]) 
+```
+
+Compare 2016 and 2017
+```{r}
+zipcodes2016 <- table(crimes2016$zipcode)
+ordered_zipcodes2016 <- order(zipcodes2016, decreasing = TRUE)
+ordered_zipcodes2016
+barplot(zipcodes2016[order(zipcodes2016, decreasing = TRUE)]) 
+
+zipcodes2017 <- table(crimes2017$zipcode)
+ordered_zipcodes2017 <- order(zipcodes2017, decreasing = TRUE)
+ordered_zipcodes2017
+barplot(zipcodes2017[order(zipcodes2017, decreasing = TRUE)]) 
+```
+*85015 was the highest crime count zipcode for both years, and crime increased from 2016-2017*
+
+How many crimes occur in the highest crime count zip each month in 2016 and 2017?
 *to return the count of the number of crimes reported each month in the highest crime zip (85015) in 2016*
 ```{r}
 phx15_16n <- crimes %>% 
@@ -108,7 +138,7 @@ phx15_16n
 #graph it!
 ```
 
-*to return the count of the number of crimes reported each month in the highest crime zip (85015) in 2016*
+*to return the count of the number of crimes reported each month in the highest crime zip (85015) in 2017*
 ```{r}
 phx15_17n <- crimes %>% 
   filter(zipcode == 85015 & year == 2017) %>% 
@@ -117,6 +147,27 @@ phx15_17n <- crimes %>%
 phx15_17n
 #graph it!
 ```
+
+What crime types are most common?
+Total number of each category of crime. 
+```{r}
+crime_count_by_category <- crimes %>% count(category)
+crime_count_by_category
+categories <- table(crimes$category)
+ordered_categories <- categories[order(categories, decreasing = TRUE)]
+barplot(ordered_categories)
+```
+
+Total number of each category of crime in zip code with highest crime count. 
+```{r}
+crimes85015 <- crimes %>% filter(zipcode == 85015)
+crimes85015 %>% count(category)
+categories85015 <- table(crimes85015$category)
+barplot(categories85015[order(categories85015, decreasing = TRUE)])
+```
+
+
+
 
 # Frequency of Burglary by zipcode (in descending order)
 
@@ -148,22 +199,6 @@ ggplot(df, aes(x = reorder(zipcode, n), y = n)) +
 ggsave("dotplot.png", scale = 2, dpi = 300)
 ```
 
-Total number of each category of crime. 
-```{r}
-crime_count_by_category <- crimes %>% count(category)
-crime_count_by_category
-categories <- table(crimes4$category)
-ordered_categories <- categories[order(categories, decreasing = TRUE)]
-barplot(ordered_categories)
-```
-
-Total number of each category of crime in zip code with highest crime count. 
-```{r}
-crimes85015 <- crimes %>% filter(zipcode == 85015)
-crimes85015 %>% count(category)
-categories85015 <- table(crimes85015$category)
-barplot(categories85015[order(categories85015, decreasing = TRUE)])
-```
 
 2. Trends (high, low, increase, decrease, anomalies):
 
@@ -429,5 +464,5 @@ ggplot(temp, aes(x = monthRC, color = category, group = category)) +
 6.Having made these plots, what are some insights you get from them? Do you see any correlations? Is there a hypothesis you would like to investigate further? What other questions do they lead you to ask?
 
 Limitations: 
-Accounts only for crimes reported to Phoenix PD. There may be many other crimes reported to surrounding PDs. Would my model be more accurate if I only included zip codes located within Phoenix boundaries?
+Accounts only for crimes reported to Phoenix PD. There may be many other crimes reported to surrounding PDs.
 
