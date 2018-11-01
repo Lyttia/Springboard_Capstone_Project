@@ -437,9 +437,30 @@ ggplotly(trend_plot2)
 
 - Zip code 85015 has the highest crime count total at almost 9000 crimes (8965).
 
-- Crime count seems to be between 5,000-5,500 each month.
+- Lowest crime count total: 
+
+- Total crime count seems to be between 5,000 - 6,000 each month in 2016 & 2017.
+
+- Overall crime has increased from one year to the next. 
+
+- Most zip codes reported more crime in 2017, but several reported less: 
+
+- Highest decrease in crime from 2016 - 2017:
+
+- Highest increase in crime from 2016 - 2017:
+
+- December decreased in crime count drastically from 2016 to 2017. 1st to 7th. 
+
+- Lowest count month: 
+
+- Crime count peaks at lower middle housing, and as property value increased, crime count decreased.
+
+- Most common place for crime to occur in Phoenix are single family homes, with burglary being the most common crime. 
 
 * Is there a hypothesis you would like to investigate further? 
+
+- There is likely a daily or hourly trend.... lets plot this next.
+
 * What other questions do they lead you to ask?
 
 -Do people in 85015 simply report more crimes than other phx zipcodes? Or are there actually more crimes?
@@ -447,93 +468,6 @@ ggplotly(trend_plot2)
 # Limitations: 
 
 - The data accounts only for crimes reported to Phoenix PD. There may be many other crimes reported to surrounding PDs.
-
-# ERRORS:
-
-```{r} 
-# NOT WORKING
-# Subset the data for the less frequent categories
-sub <- levels(ordered_categories)[1:4] # Create a subseting object
-temp <- filter(crimes4, category %in% sub) # Subset using dplyr
-
-# Make plot
-ggplot(temp, aes(x = monthRC, color = category, group = category)) +
-    my_theme +
-    geom_line(stat = "bin", size = 1) +
-    ggtitle("Crimes by Month - Less Frequent Categories") +
-    xlab(NULL) +
-    ylab("Crime Count")
-
-# Do another subset for the more frequent categories
-sub <- levels(ordered_categories)[5:7]
-temp <- filter(crimes4, category %in% sub)
-
-# Make second plot
-ggplot(temp, aes(x = monthRC, color = category, group = category)) + 
-    my_theme +
-    geom_line(stat = "bin", size = 1) +
-    ggtitle("Crime by Month - More Frequent Categories") +
-    xlab(NULL) +
-    ylab("Crime Count")
-```
-
-ERROR Frequency of Burglary by zipcode (in descending order)
-
-```{r}
-df <- crimes %>% 
-  filter(category == "Burglary") %>% 
-  group_by(zipcode) %>%
-  summarise(n = n()) %>%
-  ungroup() %>%
-  arrange(desc(n))
-```
-
-# Using ggplot2 ERROR
-
-```{r}
-ggplot(df, aes(x = reorder(zipcode, n), y = n)) + 
-  geom_point(size = 12, stat = "identity", color = "black") + 
-  geom_text(aes(label = n, fontface = "bold"), color = "white", size = 4) + 
-  coord_flip() + 
-  theme_minimal(base_size = 20) + 
-  xlab("") + ylab("") + 
-  ggtitle("Burglary offences in Greater Phoenix") +
-  scale_y_continuous(limits=c(0,max(df$n)))
-# Save the dotplot as a png file
-# ggsave("dotplot.png", scale = 2, dpi = 300)
-```
-
-Are any categories more prevalent at a certain time?
-
-```{r}
-crimes2017$category <- factor(x = crimes2017$category)
-crimes2017$category <- reorder(x = crimes2017$category, X = crimes2017$category, FUN = length)
-
-# Tally by type
-table(crimes2017$category)[order(table(crimes2017$category), decreasing = T)] # Order decreasing
-
-# Subset the data for the less frequent categories
-sub <- levels(crimes2017$category)[1:4] # Create a subsetting object
-#ERROR temp <- filter(crimes2017, sub %in% category) # Subset using dplyr
-View(temp)
-
-# Make plot
-ggplot(data = temp, aes(x = monthRC, color = category, group = category)) +
-    my_theme +
-    geom_line(stat = "bin", size = 1) +
-    ggtitle("Crimes by Month - Less Frequent Categories") +
-    xlab(NULL) +
-    ylab("Crime Count")
-
-# Do another subset for the more frequent categories
-sub <- levels()[5:7]
-temp <- filter(crimes2017, category %in% sub)
-
-# Make second plot
-ggplot(data = temp, aes(x = monthRC, color = category, group = category)) + 
-    my_theme +
-    geom_line(stat = "bin", size = 1) +
-    ggtitle("Crimes by Month - More Frequent Categories") +
-    xlab(NULL) +
-    ylab("Crime Count")
-```
+- Not enough variables. 
+- Not enough years of data. 
+- No data on criminals, victims, crime status, or repeat crimes/criminals/victims. 
