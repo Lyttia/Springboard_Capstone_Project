@@ -347,6 +347,7 @@ middlehousing = subset(lowermiddlehousing, median_value >= 250000)
 lowincomehousing = subset(crimes, median_value < 250000)
 upperhousing = subset(crimes, median_value >= 500000)
 
+#explore
 plot(count(lowincomehousing, median_value), lowincomehousing$median_value)
 plot(count(middlehousing, median_value), middlehousing$median_value)
 plot(count(upperhousing, median_value), upperhousing$median_value)
@@ -354,16 +355,22 @@ plot(count(upperhousing, median_value), upperhousing$median_value)
 ccountupperhousing <- count(upperhousing, median_value)
 upperhousing2 <- left_join(upperhousing, ccountupperhousing)
 
+ccountmiddlehousing <- count(middlehousing, median_value)
+middlehousing2 <- left_join(middlehousing, ccountmiddlehousing)
+
+ccountlowincomehousing <- count(lowincomehousing, median_value)
+lowincomehousing2 <- left_join(lowincomehousing, ccountlowincomehousing)
+
+range(crimes$median_value)
+(899275-103550)/3
+103550+265241.7= 368791.7
+368791.7+265241.7= 634033.4
+634033.4+265241.7=899275.1
+
 ```
 
 Comparisons:
 _Compare the amounts of crimes in each zip code ordered by property value._
-
-```{r}
-barplot(zipcodes[order(crimes$median_value, decreasing = TRUE)])
-
-```
-
 Scatter plots:
 
 ```{r}
@@ -384,6 +391,29 @@ gg <- ggplot(upperhousing2, aes(x = as.numeric(median_value), y = n)) +
 
 plot(gg)
 ggsave("crime_count_by_property_value_upper.png")
+
+gg2 <- ggplot(middlehousing2, aes(x = as.numeric(median_value), y = n)) + 
+  geom_point(aes(col = category)) + 
+  labs(subtitle="Scatterplot", 
+       y="Crime Count", 
+       x="Property Value", 
+       title="Crime Count by Property Value", 
+       caption = "Source: Phoenix Open Data")
+
+plot(gg2)
+ggsave("crime_count_by_property_value_middle.png")
+
+gg3 <- ggplot(lowincomehousing2, aes(x = as.numeric(median_value), y = n)) + 
+  geom_point(aes(col = category)) + 
+  labs(subtitle="Scatterplot", 
+       y="Crime Count", 
+       x="Property Value", 
+       title="Crime Count by Property Value", 
+       caption = "Source: Phoenix Open Data")
+
+plot(gg3)
+ggplotly(gg3)
+ggsave("crime_count_by_property_value_low.png")
 ```
 
 Time-series:
@@ -392,7 +422,7 @@ Time-series:
 #install.packages("plotly")
 #library(plyr)
 #library(dplyr)
-#library(plotly)
+library(plotly)
 
 crimes2016_2017 <- filter(crimes, year %in% c("2016","2017"))
 
@@ -422,6 +452,7 @@ trend_plot2 <-
   ggplot(data = totalcat_crime_2years,
        aes(x = year, y = reported_incidents, fill = category)) +
   geom_area() +
+  theme(legend.position='bottom')
   ggtitle("Crime Categories in 2016-2017") +
   scale_y_continuous(name = "Reported Incidents", labels = scales::comma) +
   my_theme
@@ -449,7 +480,7 @@ ggplotly(trend_plot2)
 
 - Highest increase in crime from 2016 - 2017:
 
-- December decreased in crime count drastically from 2016 to 2017. 1st to 7th. 
+- December decreased in crime count drastically from 2016 to 2017. From 1st to 7th place. 
 
 - Lowest count month: 
 
@@ -461,6 +492,8 @@ ggplotly(trend_plot2)
 
 - There is likely a daily or hourly trend.... lets plot this next.
 
+- 
+
 * What other questions do they lead you to ask?
 
 -Do people in 85015 simply report more crimes than other phx zipcodes? Or are there actually more crimes?
@@ -470,4 +503,4 @@ ggplotly(trend_plot2)
 - The data accounts only for crimes reported to Phoenix PD. There may be many other crimes reported to surrounding PDs.
 - Not enough variables. 
 - Not enough years of data. 
-- No data on criminals, victims, crime status, or repeat crimes/criminals/victims. 
+- No data on area demographics, criminals, victims, crime status, or repeat crimes/criminals/victims. 
