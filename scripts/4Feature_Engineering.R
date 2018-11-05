@@ -123,4 +123,27 @@ c('LOAN / FINANCE COMPANY','BANK / SAVINGS / CREDIT UNION','ATM SEPARATE FROM BA
 
 levels(crimes_joined$premise)
 
-write_csv(crimes_joined, "tempcrimesfortestingmodel.csv")
+# 7- Create Housing Value Datasets for Visualization ============================================
+
+lowermiddlehousing = subset(crimes, median_value < 500000)
+middlehousing = subset(lowermiddlehousing, median_value >= 250000)
+lowincomehousing = subset(crimes, median_value < 250000)
+upperhousing = subset(crimes, median_value >= 500000)
+
+ccountupperhousing <- count(upperhousing, median_value)
+upperhousing2 <- left_join(upperhousing, ccountupperhousing)
+
+ccountmiddlehousing <- count(middlehousing, median_value)
+middlehousing2 <- left_join(middlehousing, ccountmiddlehousing)
+
+ccountlowincomehousing <- count(lowincomehousing, median_value)
+lowincomehousing2 <- left_join(lowincomehousing, ccountlowincomehousing)
+
+range(crimes$median_value)
+(899275-103550)/3
+103550+265241.7= 368791.7
+368791.7+265241.7= 634033.4
+634033.4+265241.7=899275.1
+
+
+write_csv(crimes_joined, "crimesfortesting.csv")

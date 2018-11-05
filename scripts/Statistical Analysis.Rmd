@@ -339,50 +339,29 @@ barplot(premise_table[ordered_premise])
 ```
 
 _Does overall crime count increase or decrease as property values increase?_
-*Property values need to be binned*. 
 
 ```{r}
-lowermiddlehousing = subset(crimes, median_value < 500000)
-middlehousing = subset(lowermiddlehousing, median_value >= 250000)
-lowincomehousing = subset(crimes, median_value < 250000)
-upperhousing = subset(crimes, median_value >= 500000)
-
 #explore
 plot(count(lowincomehousing, median_value), lowincomehousing$median_value)
 plot(count(middlehousing, median_value), middlehousing$median_value)
 plot(count(upperhousing, median_value), upperhousing$median_value)
-
-ccountupperhousing <- count(upperhousing, median_value)
-upperhousing2 <- left_join(upperhousing, ccountupperhousing)
-
-ccountmiddlehousing <- count(middlehousing, median_value)
-middlehousing2 <- left_join(middlehousing, ccountmiddlehousing)
-
-ccountlowincomehousing <- count(lowincomehousing, median_value)
-lowincomehousing2 <- left_join(lowincomehousing, ccountlowincomehousing)
-
-range(crimes$median_value)
-(899275-103550)/3
-103550+265241.7= 368791.7
-368791.7+265241.7= 634033.4
-634033.4+265241.7=899275.1
-
 ```
 
 Comparisons:
 _Compare the amounts of crimes in each zip code ordered by property value._
 Scatter plots:
+```{r}
+library(ggplot2)
+library(plotly)
+options(scipen=999)  # turn-off scientific notation like 1e+48
+theme_set(theme_bw())  # pre-set the bw theme.
+```
 
 ```{r}
-# install.packages("ggplot2")
-# load package and data
-options(scipen=999)  # turn-off scientific notation like 1e+48
-library(ggplot2)
-theme_set(theme_bw())  # pre-set the bw theme.
-
-# Scatterplot
-gg <- ggplot(upperhousing2, aes(x = as.numeric(median_value), y = n)) + 
-  geom_point(aes(col = category)) + 
+gg <- ggplot(upperhousing2, aes(x = as.numeric(median_value), y = n, col = category)) + 
+  ylim(0, 3500) + 
+  geom_point(alpha = 0.4) +
+  geom_smooth(se = FALSE, size = .4) +
   labs(subtitle="Scatterplot", 
        y="Crime Count", 
        x="Property Value", 
@@ -390,10 +369,15 @@ gg <- ggplot(upperhousing2, aes(x = as.numeric(median_value), y = n)) +
        caption = "Source: Phoenix Open Data")
 
 plot(gg)
-ggsave("crime_count_by_property_value_upper.png")
+#interactive plotly
+#ggplotly(gg)
+ggsave("scaled_crime_count_by_property_value_upper.png")
+```
 
-gg2 <- ggplot(middlehousing2, aes(x = as.numeric(median_value), y = n)) + 
-  geom_point(aes(col = category)) + 
+```{r}
+gg2 <- ggplot(middlehousing2, aes(x = as.numeric(median_value), y = n, color = category)) + 
+  geom_point(alpha = 0.4) + 
+  geom_smooth(se = FALSE, size = .4) +
   labs(subtitle="Scatterplot", 
        y="Crime Count", 
        x="Property Value", 
@@ -401,10 +385,17 @@ gg2 <- ggplot(middlehousing2, aes(x = as.numeric(median_value), y = n)) +
        caption = "Source: Phoenix Open Data")
 
 plot(gg2)
+#interactive plotly
+#ggplotly(gg2)
 ggsave("crime_count_by_property_value_middle.png")
+```
 
-gg3 <- ggplot(lowincomehousing2, aes(x = as.numeric(median_value), y = n)) + 
-  geom_point(aes(col = category)) + 
+
+```{r}
+gg3 <- ggplot(lowincomehousing2, aes(x = as.numeric(median_value), y = n, color = category)) + 
+  ylim(0, 3500) +
+  geom_point(alpha = 0.4) + 
+  geom_smooth(se = FALSE, size = .4) +
   labs(subtitle="Scatterplot", 
        y="Crime Count", 
        x="Property Value", 
@@ -412,7 +403,8 @@ gg3 <- ggplot(lowincomehousing2, aes(x = as.numeric(median_value), y = n)) +
        caption = "Source: Phoenix Open Data")
 
 plot(gg3)
-ggplotly(gg3)
+#interactive plotly
+#ggplotly(gg3)
 ggsave("crime_count_by_property_value_low.png")
 ```
 
