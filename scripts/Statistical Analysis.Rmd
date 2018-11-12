@@ -326,16 +326,28 @@ barplot(categories85015[order(categories85015, decreasing = TRUE)])
 ```
 
 ```{r}
-g <- ggplot(crimes, aes(premise, decreasing = TRUE))
-g + geom_bar(aes(fill=category), width = 0.5) + 
-  theme(axis.text.x= element_text(angle = 65, vjust= 0.6)) + 
+g <- ggplot(crimes, aes(premise, decreasing = F))
+g + geom_histogram(aes(fill=category), width = 0.5, stat = "count") + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  coord_flip() +
   labs(title= "Premise Frequency Bar Chart")
 #ggsave("Premise Frequency Bar Chart.png")
 
-#make table to order for ordered bar plot
+crimes$premise <- forcats::fct_lump(crimes$premise, n = 6)
+fct_reorder(premise, premisecount)
+premisecount <- count(premise)
+
+# make table to order for ordered bar plot
+      premise_table <- table(crimes$premise)
+      ordered_premise <- order(premise_table, decreasing = TRUE)
+      bar_list<- as.list(barplot(premise_table[ordered_premise]))
+      
+# want to selec top 10 crime types
 premise_table <- table(crimes$premise)
 ordered_premise <- order(premise_table, decreasing = TRUE)
 barplot(premise_table[ordered_premise])
+
+
 ```
 
 _Does overall crime count increase or decrease as property values increase?_
