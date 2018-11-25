@@ -16,6 +16,7 @@ library(tidyverse)
 crimes <- file.choose()
 crimes <- read_csv(crimes)
 
+
 # parsing corrections:
 crimes$monthRC <- factor(x = crimes$month, 
                        labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -315,7 +316,86 @@ crime_count_by_category
 categories <- table(crimes$category)
 ordered_categories <- categories[order(categories, decreasing = TRUE)]
 barplot(ordered_categories)
+
+ggplot(crimes, aes(x = fct_infreq(category), fill = fct_infreq(category))) +
+  geom_bar(width = 0.5, color = "black", show.legend = F) +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6)) + 
+  geom_text(stat = "Count", aes(label=..count..), vjust=-0.5)+
+  ggtitle("Category Frequency Bar Chart") +
+  xlab("Category") +
+  ylab("Crime Count")
 ```
+
+# Larceny- theft is the most common crime type with 80070/159319 crimes- 50% of the data.
+```{r}
+ggplot(data = crimes, aes(x = category)) +
+  geom_density() +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6)) + 
+  
+  facet_wrap(~monthRC)
+```
+
+```{r}
+ggplot(data = crimes, aes(x = monthRC)) +
+  geom_density() +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6)) + 
+  facet_wrap(~category)
+```
+
+```{r}
+ggplot(data = crimes, aes(x = day)) +
+  geom_density() +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6)) + 
+  facet_wrap(~monthRC)
+```
+
+
+```{r}
+ggplot(data = crimes, aes(x = day)) +
+  geom_density() +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6)) + 
+  facet_wrap(~category)
+```
+
+```{r}
+ggplot(data = crimes, aes(x = median_value)) +
+  geom_density() +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6)) + 
+  facet_wrap(~violent_crimes)
+```
+
+```{r}
+ggplot(data = crimes, aes(x = median_value)) +
+  geom_density() +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6)) + 
+  facet_wrap(~category)
+```
+
+*The median value is not equally distributed. I am afraid that the reoccuring pattern in the data is more the distribution of housing value across Phoenix. How can I normalize this?*
+
+```{r}
+
+```
+
+
+```{r}
+ggplot(data = crimes, aes(x = category)) +
+  geom_density() +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6)) + 
+  facet_wrap(~zipcode, ncol = 2)
+```
+
+```{r}
+p <- ggplot(crimes, aes(x= category, y=median_value, fill = category)) + 
+  geom_boxplot()+
+  coord_flip() +
+  theme(legend.position= "none") +
+  labs(title="Crime Category Distribution by Property Value",x= "Crime Category", y = "Property Value")
+p
+ggsave("cat_by_val_box.png")
+```
+
+*The box plots are another representation of the crime category distribution across property value in Phoenix. Crimes among all categories peak in areas of property valued at under 250,000. This is also the most common value for single family housing in Phoenix, which is the location with the highest crime count with almost one quarter of all crimes occuring at a home.* 
 
 *Total number of each category of crime in zip code with highest crime count.* 
 ```{r}
@@ -326,28 +406,33 @@ barplot(categories85015[order(categories85015, decreasing = TRUE)])
 ```
 
 ```{r}
-g <- ggplot(crimes, aes(premise, decreasing = F))
+library(forcats)
+crimes$premiselump <- forcats::fct_lump(crimes$premise, n = 20)
+
+g <- ggplot(crimes, aes(premiselump))
 g + geom_histogram(aes(fill=category), width = 0.5, stat = "count") + 
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   coord_flip() +
   labs(title= "Premise Frequency Bar Chart")
-#ggsave("Premise Frequency Bar Chart.png")
 
-crimes$premise <- forcats::fct_lump(crimes$premise, n = 6)
-fct_reorder(premise, premisecount)
-premisecount <- count(premise)
+ggplot(crimes, aes(x = fct_infreq(premiselump), fill = fct_infreq(premiselump))) +
+  geom_bar(width = 0.5, color = "black", show.legend = F) +
+  xlab("Premise") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  geom_text(stat = "count", aes(label=..count..), vjust=-0.5, size = 2) +
+  labs(title= "Lumped Premise Frequency Bar Chart")
+#ggsave("Lumped Premise Frequency Bar Chart.png")
 
-# make table to order for ordered bar plot
-      premise_table <- table(crimes$premise)
-      ordered_premise <- order(premise_table, decreasing = TRUE)
-      bar_list<- as.list(barplot(premise_table[ordered_premise]))
-      
-# want to selec top 10 crime types
-premise_table <- table(crimes$premise)
-ordered_premise <- order(premise_table, decreasing = TRUE)
-barplot(premise_table[ordered_premise])
+count(crimes$premiselump)
+  
+#other: 9501/159319 = 0.05963507
+#sfh: 37057/159319 = 0.232596 = 23% of all crimes occur at home. 
 
-
+# adding premise counts to dataframe
+# premise_counts <- count(crimes, premise)
+# crimes <- left_join(crimes, premise_counts)
+#levels(crimes$premise)
+#fct_reorder(crimes$premise, crimes$premisecount)
 ```
 
 _Does overall crime count increase or decrease as property values increase?_
@@ -368,6 +453,25 @@ library(plotly)
 options(scipen=999)  # turn-off scientific notation like 1e+48
 theme_set(theme_bw())  # pre-set the bw theme.
 ```
+
+
+```{r}
+allhousing <- upperhousing2, middlehousing2, lowincomehousing2
+```
+
+```{r}
+gg <- ggplot(, aes(x = as.numeric(median_value), y = n, col = category)) + 
+  geom_point(alpha = 0.4) +
+  geom_smooth(se = FALSE, size = .4) +
+  labs(subtitle="Scatterplot", 
+       y="Crime Count", 
+       x="Property Value", 
+       title="Crime Count by Property Value", 
+       caption = "Source: Phoenix Open Data")
+
+plot(gg)
+```
+
 
 ```{r}
 gg <- ggplot(upperhousing2, aes(x = as.numeric(median_value), y = n, col = category)) + 

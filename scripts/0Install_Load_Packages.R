@@ -21,15 +21,21 @@
 
 # Load packages: to be included in each script when needed
 
-MANIPULATING
-library(tidyverse)- s1, s2, s3, s4, maps, analysis
-library(devtools)- maps
-library(stringi)- used?
-library(car)- s4
+#MANIPULATING
+library(tidyverse)
+#- s1, s2, s3, s4, maps, analysis
+library(devtools)
+#- maps
+library(stringi)
+#- used?
+library(car)
+#- s4
 
-VIZUALIZATION
-library(ggplot2)- maps, analysis
-library(ggmap)- maps
+#VIZUALIZATION
+library(ggplot2)
+#- maps, analysis
+library(ggmap)
+#- maps
 
 #ML- *included in script 5
 #library(caTools)- s5*

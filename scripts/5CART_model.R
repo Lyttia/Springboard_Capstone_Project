@@ -80,36 +80,6 @@ perf = performance(pred, "tpr", "fpr")
 plot(perf)
 # plots ROC curve
 
-# Try Random Forest
-library(randomForest)
-
-# outcome variable must be set as factor, since there is no method arg in random forest for classification problems
-
-Train$violent_crimes = as.factor(Train$violent_crimes)
-Test$violent_crimes = as.factor(Test$violent_crimes)
-str(Test)
-
-# Random Forest model
-
-CrimeForest = randomForest(violent_crimes ~ month + day + hour + premise + monthRC + 
-                             median_value + total_listed + singl_fam_home + edu_facility +
-                             unknown + public_trans + medical_facility + natl_envnmt, data = Train, nodesize = 25, ntree=200)
-
-print(CrimeForest)
-importance(CrimeForest)
-varImpPlot(CrimeForest)
-
-PredictForest = predict(CrimeForest, newdata = Test)
-table(Test$violent_crimes, PredictForest)
-
-# PredictForest
-#     0     1
-# 0 41125    1
-# 1  6668    1
-
-(41125+1)/(41125+1+6668+1)
-# 0.8604666
-
 library(caret)
 library(e1071)
 
@@ -137,8 +107,41 @@ table(Test$violent_crimes, PredictCV)
 
 # cp stayed the same, and accuracy did not change 
 
+# Random Forest--------------------------------------------------------------------------
+library(randomForest)
+
+# outcome variable must be set as factor, since there is no method arg in random forest for classification problems
+
+Train$violent_crimes = as.factor(Train$violent_crimes)
+Test$violent_crimes = as.factor(Test$violent_crimes)
+str(Test)
+
+# Random Forest model
+
+CrimeForest = randomForest(violent_crimes ~ month + day + hour + premise + monthRC + 
+                             median_value + total_listed + singl_fam_home + edu_facility +
+                             unknown + public_trans + medical_facility + natl_envnmt, data = Train, nodesize = 25, ntree=300)
+
+print(CrimeForest)
+
+PredictForest = predict(CrimeForest, newdata = Test)
+
+table(Test$violent_crimes, PredictForest)
+
+# PredictForest
+#     0     1
+# 0 41125    1
+# 1  6668    1
+
+(41125+1)/(41125+1+6668+1)
+# 0.8604666
+
+
 # display indicator importance
 # make dataframe from importance() output
+
+importance(CrimeForest)
+varImpPlot(CrimeForest)
 
 feat_imp_df <- importance(CrimeForest) %>% 
   data.frame() %>% 

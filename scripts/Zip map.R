@@ -4,14 +4,14 @@
 library(tidyverse)
 library(maptools)
 library(ggplot2)
-devtools::install_github("dkahle/ggmap", ref = "tidyup", dependencies = T)
+#devtools::install_github("dkahle/ggmap", ref = "tidyup", dependencies = T)
 library(ggmap)
-
-# if you want to type data file path/name use: 
-# area <- readShapePoly(".shp")
+install.packages("sf")
+library(sf)
 
 # if you want to choose data file from pc use: 
 area <- readShapePoly(file.choose())
+area <- sf::st_read(file.choose())
 
 # set colors
 library(RColorBrewer)
@@ -19,6 +19,7 @@ colors <- brewer.pal(9, "BuGn")
 
 # set up PHX base map from Google Map Static API
 # must obtain API key from Google, assign to project, and enable billing
+# replace "hidden" with API key
 register_google(key = hidden)
 
 # store phx base map image
@@ -44,22 +45,20 @@ zipcoord1 <- zipcoord %>%
   select(Zipcode, City, State, Lat, Long) %>% 
   rename(zipcode = Zipcode)
 
-View(zipcoord1)
-
 # join zip coordinates to crime data
-crimes4coord <- left_join(crimes4, zipcoord1) %>% 
+crimescoord <- left_join(crimes, zipcoord1) %>% 
   select(-zipname)
 
-View(crimes4coord)
+View(crimescoord)
 
 # not super helpful: all of the points in one zipcode were assigned to the same 
 # coordinate, when jittered, crimes cover the entire city, with no clear distinctions
 phxcrimemap_byzip <- ggmap(mapImage, extent ='device') +
   geom_jitter(aes(x = Long, y = Lat, colour = category, alpha = 0.), 
-              data = crimes4coord, width = 0.5, height = 0.5) +  
+              data = crimescoord, width = 0.5, height = 0.5) +  
   ggtitle('Crime in Phoenix')
 phxcrimemap_byzip
-ggsave("Crime Map by Zip.png")
+#ggsave("Crime Map by Zip.png")
 
 # May be helpful to add alpha value, group categories, or plot violent/nonviolent
 
@@ -71,19 +70,19 @@ ggsave("Crime Map by Zip.png")
 
 # broken apart by crime category
 phxcrimemap_bycat <- ggmap(mapImage, extent='device') +
-  geom_point(aes(x= Long, y= Lat, colour= category), data=crimes4coord) +
+  geom_point(aes(x= Long, y= Lat, colour= category, alpha= 0.3, data=crimescoord)) +
   scale_colour_discrete(guide='none') +
   facet_wrap(~ category) +
   ggtitle('Crime in Phoenix')
 phxcrimemap_bycat
-ggsave("Crime Map by Category.png")
+#ggsave("Crime Map by Category.png")
 
 # More helpful map would show the density of crime in each zipcode
 
 # store contours variable
 contours <- stat_density2d(
   aes(x = Long, y = Lat, fill = ..level.., alpha=..level..),
-  size = 0.1, data = crimes4coord, n=200,
+  size = 0.1, data = crimescoord, n=200,
   geom = "polygon")
 
 # Can I add jitter, since all points for each zipcode are codded
@@ -95,7 +94,7 @@ crimedensity_byzip <- ggmap(mapImage, extent='device') +
   ggtitle('Crime Density in Phoenix') 
 
 crimedensity_byzip
-  ggsave("Crime Density by Zip.png")
+  #ggsave("Crime Density by Zip.png")
 # Warning message:
 # Removed 11215 rows containing non-finite values (stat_density2d).
 # Check for NA or values outside of map range. 
