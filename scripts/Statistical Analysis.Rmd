@@ -373,16 +373,36 @@ ggplot(data = crimes, aes(x = median_value)) +
 
 *The median value is not equally distributed. I am afraid that the reoccuring pattern in the data is more the distribution of housing value across Phoenix. How can I normalize this?*
 
+*Facet grids that compare violence trends across the years*
 ```{r}
+ggplot(data = crimes2016_2017, aes(x = day, fill = crime.type)) +
+  geom_bar() +
+  facet_grid(crime.type ~ year)+
+  theme(legend.position= "none") +
+  labs(title="Violence by Day of the Month",x= "Day of the Month", y = "Count") +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6))
+ggsave("2016-2017 Violence by Day.png")
 
+ggplot(data = crimes2016_2017, aes(x = hour, fill = crime.type)) +
+  geom_bar() +
+  facet_grid(crime.type ~ year) +
+  theme(legend.position= "none") +
+  labs(title="Violence by Hour",x= "Hour", y = "Count") +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6))
+ggsave("2016-2017 Violence by Hour.png")
+
+ggplot(data = crimes2016_2017, aes(x = hour, fill = crime.type)) +
+  geom_bar() +
+  facet_grid(category ~ year) +
+  theme(legend.position= "bottom") +
+  labs(title="Crime Category by Hour",x= "Hour", y = "Count") +
+  theme(axis.text.x= element_text(angle = 45, vjust= 0.6), strip.text.y = element_text(angle = 0))
+ggsave("2016-2017 Crime Category by Hour.png")
 ```
 
 
 ```{r}
-ggplot(data = crimes, aes(x = category)) +
-  geom_density() +
-  theme(axis.text.x= element_text(angle = 45, vjust= 0.6)) + 
-  facet_wrap(~zipcode, ncol = 2)
+
 ```
 
 ```{r}
@@ -549,6 +569,14 @@ trend_plot <-
   my_theme
 
 ggplotly(trend_plot)
+
+density_plot <- 
+  ggplot(data = total_crime_2years,
+       aes(x = year, y = reported_incidents, fill = crime.type)) +
+  geom_density() +
+  ggtitle("Violent vs. Non-Violent Crimes in 2016-2017") +
+  scale_y_continuous(name = "Reported Incidents", labels = scales::comma) +
+  my_theme
 
 totalcat_crime_2years <-
   crimes2016_2017 %>% 
